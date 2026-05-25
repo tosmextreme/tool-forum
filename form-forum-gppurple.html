@@ -1,0 +1,2450 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form — Forum [GP:PURPLE] v1</title>
+<script src="https://accounts.google.com/gsi/client"></script>
+<!-- PDF.js and SheetJS are loaded on-demand when needed -->
+<style>
+:root{--bg:#070d1a;--bg2:#0d1526;--card:#111d30;--card2:#162236;--border:#1e3556;--border2:#2a4872;--blue:#3b82f6;--blue2:#60a5fa;--cyan:#06b6d4;--text:#e8eef8;--text2:#8ba3c4;--text3:#4a6383;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#a855f7;--purple2:#c084fc;--shadow:0 0 40px rgba(168,85,247,.08)}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Noto Sans Thai',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 25% 20%,rgba(168,85,247,.05) 0%,transparent 50%),radial-gradient(ellipse at 75% 80%,rgba(192,132,252,.03) 0%,transparent 50%);pointer-events:none;z-index:0}
+.page{display:none;min-height:100vh;position:relative;z-index:1}.page.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.center-page{align-items:center;justify-content:center;padding:24px}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:50px 42px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow);animation:fadeUp .5s ease}
+.login-logo{width:76px;height:76px;background:linear-gradient(135deg,var(--purple),var(--purple2));border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 26px;box-shadow:0 0 36px rgba(168,85,247,.3)}
+.login-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.login-brand{font-size:17px;font-weight:800;color:var(--purple2);margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:32px;line-height:1.6}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:11px;color:var(--text3)}
+#google-signin-btn{display:flex;justify-content:center}
+.setup-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:40px;max-width:640px;width:100%;animation:fadeUp .5s ease}
+.setup-step{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(30,53,86,.4);font-size:13px;color:var(--text2);line-height:1.7}
+.setup-step:last-child{border-bottom:none}
+.step-num{min-width:24px;height:24px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--purple2)}
+code{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-radius:4px;padding:1px 6px;font-size:12px;color:var(--cyan);font-family:Consolas,monospace}
+.denied-card{background:var(--card);border:1px solid rgba(239,68,68,.2);border-radius:22px;padding:50px 42px;max-width:440px;width:100%;text-align:center;animation:fadeUp .5s ease}
+.denied-icon{width:76px;height:76px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 26px}
+#page-main{flex-direction:column}
+.topbar{height:60px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100}
+.topbar-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--purple),var(--purple2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:700;flex:1}
+.topbar-title span{color:var(--purple2)}
+.user-chip{display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:4px 12px 4px 4px}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center;font-size:13px;overflow:hidden;flex-shrink:0}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
+.user-name{font-size:13px;color:var(--text2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:2px;overflow-x:auto}
+.tab-btn{padding:13px 16px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text3);font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tab-btn:hover{color:var(--text2)}.tab-btn.active{color:var(--purple2);border-bottom-color:var(--purple)}
+.tab-content{display:none}.tab-content.active{display:block}
+.main-content{padding:28px 20px;max-width:760px;width:100%;margin:0 auto}
+.main-wide{padding:28px 20px;max-width:1000px;width:100%;margin:0 auto}
+.forum-content{padding:28px 20px;max-width:900px;width:100%;margin:0 auto}
+.section-hdr{margin-bottom:24px}.section-title{font-size:20px;font-weight:700;margin-bottom:5px}
+.section-desc{font-size:13px;color:var(--text2)}
+.btn{padding:10px 20px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;box-shadow:0 4px 16px rgba(168,85,247,.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(168,85,247,.35)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-secondary:hover{border-color:var(--border2);color:var(--text)}
+.btn-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green)}
+.btn-success:hover{background:rgba(16,185,129,.2)}
+.btn-danger{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+.btn-danger:hover{background:rgba(239,68,68,.15)}
+.btn-add{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);color:var(--purple2);padding:9px 16px}
+.btn-add:hover{background:rgba(168,85,247,.2)}
+.btn-astek{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);color:var(--cyan)}
+.btn-astek:hover{background:rgba(6,182,212,.2)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:6px}
+.logout-btn{background:transparent;border:1px solid var(--border);border-radius:7px;padding:5px 11px;color:var(--text3);font-size:12px;cursor:pointer;transition:all .2s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:14px}
+.form-group{margin-bottom:20px}.form-group:last-child{margin-bottom:0}
+.f-label{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.f-label .req{color:var(--red);margin-left:3px}
+.f-label .opt{color:var(--text3);font-size:10px;font-weight:400;text-transform:none;margin-left:5px}
+.f-input,.f-textarea,.f-select{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;outline:none;transition:all .2s;font-family:inherit}
+.f-input:focus,.f-textarea:focus,.f-select:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.f-input::placeholder,.f-textarea::placeholder{color:var(--text3)}
+.f-textarea{resize:vertical;min-height:80px}
+.f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a6383' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+.date-input{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;outline:none;cursor:pointer;transition:all .2s;font-family:inherit}
+.date-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.date-input::-webkit-calendar-picker-indicator{filter:invert(.6) sepia(1) saturate(5) hue-rotate(240deg);cursor:pointer}
+.name-wrap{display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:9px;overflow:hidden;transition:all .2s}
+.name-wrap:focus-within{border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.name-prefix{padding:11px 14px;background:rgba(168,85,247,.07);border-right:1px solid var(--border);font-size:14px;font-weight:700;color:var(--purple2);white-space:nowrap}
+.name-input{flex:1;padding:11px 14px;background:transparent;border:none;color:var(--text);font-size:14px;outline:none}
+.name-input::placeholder{color:var(--text3)}
+.btn-group{display:flex;flex-wrap:wrap;gap:8px}
+.company-btn{padding:10px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.company-btn:hover{border-color:var(--border2);color:var(--text)}
+.company-btn.selected{background:rgba(168,85,247,.1);border-color:var(--purple);color:var(--purple2)}
+.section-block{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:opacity .2s,border-color .2s}
+.section-block.dragging{opacity:.4}
+.section-block.drag-over{border-color:var(--purple);box-shadow:0 0 0 2px rgba(168,85,247,.3)}
+.section-block-header{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--card2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.section-block-icon{font-size:18px}
+.section-block-label{font-size:14px;font-weight:700;flex:1}
+.section-block-body{padding:18px}
+.section-sub-header{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:8px 0;margin:12px 0 8px;border-top:1px solid var(--border)}
+.instance-block{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:9px;padding:16px;margin-bottom:10px;position:relative}
+.instance-num{font-size:11px;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.img-upload-wrap{border:1px dashed var(--border);border-radius:9px;padding:16px;background:var(--bg2)}
+.img-tabs{display:flex;gap:6px;margin-bottom:12px}
+.img-tab{padding:5px 12px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:12px;cursor:pointer;transition:all .2s}
+.img-tab.active{background:rgba(168,85,247,.1);border-color:var(--purple);color:var(--purple2)}
+.img-preview-wrap{margin-top:10px;display:none}
+.img-preview{max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border)}
+.img-size-badge{font-size:11px;color:var(--text3);margin-top:4px}
+.img-clear{margin-top:6px;padding:4px 10px;background:transparent;border:1px solid rgba(239,68,68,.2);border-radius:5px;color:var(--red);font-size:11px;cursor:pointer}
+.daterange-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.daterange-row{display:flex;flex-direction:column;gap:5px}
+.daterange-row label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase}
+.daterange-preview{font-size:12px;color:var(--cyan);margin-top:6px;padding:8px 12px;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15);border-radius:7px}
+.item-table{width:100%;border-collapse:collapse;font-size:13px}
+.item-table th{padding:9px 12px;background:var(--bg2);text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border)}
+.item-table td{padding:8px 10px;border-bottom:1px solid rgba(30,53,86,.4)}
+.item-table tr:last-child td{border-bottom:none}
+.item-input{width:100%;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.item-input:focus{border-color:var(--purple)}
+.add-section-wrap{position:relative;display:inline-block}
+.add-section-menu{position:absolute;top:calc(100% + 6px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:280px;z-index:200;box-shadow:0 12px 32px rgba(0,0,0,.4);max-height:400px;overflow-y:auto}
+.add-section-menu.hidden{display:none}
+.add-menu-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text2)}
+.add-menu-item:hover{background:rgba(168,85,247,.08);color:var(--text)}
+.add-menu-icon{font-size:16px;width:24px;text-align:center}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700}
+.badge-admin{background:rgba(59,130,246,.12);color:var(--blue2);border:1px solid rgba(59,130,246,.25)}
+.badge-blue{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.25)}
+.badge-purple{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.25)}
+.badge-editor{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.perm-input{flex:1;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none}
+.perm-input:focus{border-color:var(--purple)}
+.email-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;margin-bottom:8px}
+.email-item-l{display:flex;align-items:center;gap:10px}
+.dot{width:8px;height:8px;border-radius:50%}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.stat-val{font-size:28px;font-weight:700;color:var(--purple2)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase}
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.log-table{width:100%;border-collapse:collapse;font-size:13px}
+.log-table th{padding:10px 14px;background:var(--bg2);text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border)}
+.log-table td{padding:10px 14px;border-bottom:1px solid rgba(30,53,86,.4);color:var(--text2)}
+.log-table tr:last-child td{border-bottom:none}
+.log-table tr:hover td{background:rgba(168,85,247,.02)}
+.sbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700}
+.s-ok{background:rgba(16,185,129,.1);color:var(--green)}
+.s-no{background:rgba(239,68,68,.1);color:var(--red)}
+.resp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.resp-card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;gap:12px;flex-wrap:wrap}
+.resp-card-info{flex:1}
+.resp-date{font-size:17px;font-weight:700;margin-bottom:3px}
+.resp-meta{font-size:12px;color:var(--text2)}
+.resp-body{padding:18px;border-top:1px solid var(--border);display:none}
+.resp-body.open{display:block}
+.resp-section-item{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px}
+.resp-section-title{font-weight:700;margin-bottom:6px}
+.resp-field{color:var(--text2);margin-bottom:4px}
+.resp-field strong{color:var(--text3);margin-right:5px}
+.hist-item{padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.hist-who{font-weight:700;font-size:13px;margin-bottom:4px}
+.hist-when{font-size:12px;color:var(--text2)}
+.hist-detail{font-size:12px;color:var(--text3);margin-top:6px;padding-top:6px;border-top:1px solid rgba(30,53,86,.5)}
+.demo-banner{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:9px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:var(--yellow);display:flex;align-items:center;gap:8px}
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--card2);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--green);box-shadow:0 8px 28px rgba(0,0,0,.35);transform:translateY(110px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:999;align-items:center;justify-content:center}
+.overlay.active{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:440px;width:90%;animation:fadeUp .3s ease}
+.modal h3{margin-bottom:12px;font-size:17px}
+.modal p{color:var(--text2);font-size:14px;margin-bottom:22px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-input{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;margin-bottom:14px}
+.modal-input:focus{border-color:var(--purple)}
+.edit-modal{max-width:700px;max-height:85vh;overflow-y:auto}
+.role-select{width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;appearance:none;cursor:pointer}
+.role-select:focus{border-color:var(--purple)}
+.status-btns{display:flex;gap:8px;flex-wrap:wrap}
+.status-btn{padding:8px 18px;border:2px solid transparent;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;background:var(--bg2)}
+.status-btn[data-val="แก้ไขแล้ว"]{border-color:rgba(16,185,129,.3);color:var(--green)}
+.status-btn[data-val="แก้ไขแล้ว"].active,.status-btn[data-val="แก้ไขแล้ว"]:hover{background:rgba(16,185,129,.15);border-color:var(--green)}
+.status-btn[data-val="กำลังปรับปรุง"]{border-color:rgba(245,158,11,.3);color:var(--yellow)}
+.status-btn[data-val="กำลังปรับปรุง"].active,.status-btn[data-val="กำลังปรับปรุง"]:hover{background:rgba(245,158,11,.15);border-color:var(--yellow)}
+.status-btn[data-val="ปิดระบบ"]{border-color:rgba(239,68,68,.3);color:var(--red)}
+.status-btn[data-val="ปิดระบบ"].active,.status-btn[data-val="ปิดระบบ"]:hover{background:rgba(239,68,68,.15);border-color:var(--red)}
+.sub-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.stab{padding:8px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text3);font-size:13px;cursor:pointer;font-weight:600;transition:all .2s}
+.stab:hover{color:var(--text2)}.stab.active{background:rgba(168,85,247,.1);border-color:var(--purple);color:var(--purple2)}
+.stab-pane{display:none}.stab-pane.active{display:block}
+.hist-item.h-submit{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.05)}
+.hist-item.h-submit .hist-who{color:var(--green)}
+.hist-item.h-edit{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.05)}
+.hist-item.h-edit .hist-who{color:var(--yellow)}
+.hist-item.h-delete{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05)}
+.hist-item.h-delete .hist-who{color:var(--red)}
+.edit-banner{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:12px 18px;margin-bottom:16px;align-items:center;gap:12px;flex-wrap:wrap;display:none}
+.edit-banner.show{display:flex}
+.edit-banner-txt{flex:1;font-size:13px;color:var(--yellow);line-height:1.5}
+.grid-tbl-wrap{overflow-x:auto;margin-bottom:10px}
+.grid-tbl{border-collapse:collapse;min-width:100%;font-size:13px}
+.grid-tbl th{padding:9px 12px;background:var(--bg2);text-align:center;font-size:11px;font-weight:700;color:var(--text3);border:1px solid var(--border);white-space:nowrap}
+.grid-tbl td{padding:7px 10px;border:1px solid rgba(30,53,86,.4);vertical-align:top;min-width:160px}
+.grid-tbl .row-hdr{background:var(--bg2);font-size:11px;font-weight:700;color:var(--text3);white-space:nowrap;min-width:auto!important;text-align:left}
+.card-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:620px){.card-grid-2{grid-template-columns:1fr}}
+.sec-tbl-wrap{overflow-x:auto;margin-bottom:10px}
+.sec-tbl{border-collapse:collapse;width:100%;font-size:13px}
+.sec-tbl th{padding:8px 10px;background:var(--bg2);text-align:left;font-size:11px;font-weight:700;color:var(--text3);border:1px solid var(--border);white-space:nowrap}
+.sec-tbl td{padding:6px 8px;border:1px solid rgba(30,53,86,.3);vertical-align:top}
+.sec-tbl .n-col{background:var(--bg2);text-align:center;font-weight:700;font-size:12px;color:var(--text3);white-space:nowrap}
+/* Forum-specific */
+.forum-sec-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.forum-sec-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--border)}
+.forum-sec-hdr input{flex:1;background:transparent;border:none;color:var(--text);font-size:14px;font-weight:700;outline:none}
+.forum-sec-hdr input::placeholder{color:var(--text3)}
+.forum-sec-body{padding:16px}
+.forum-import-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.forum-import-btn:hover{border-color:var(--purple);color:var(--purple2)}
+.import-status{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:10px}
+.import-ok{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.3);color:var(--green)}
+.import-err{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.3);color:var(--red)}
+.import-info{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.3);color:var(--purple2)}
+.forum-preview-wrap{background:#fff;border-radius:10px;padding:20px;overflow:auto;max-height:650px;border:1px solid #ddd}
+.forum-code-wrap{margin-top:12px}
+.forum-code-wrap summary{font-size:12px;color:var(--text3);cursor:pointer;padding:8px 0;user-select:none}
+@media(max-width:580px){.login-card,.denied-card{padding:32px 20px}.stats-row{grid-template-columns:1fr}.daterange-wrap{grid-template-columns:1fr}.main-content,.main-wide,.forum-content{padding:16px 12px}.topbar-title{font-size:12px}.user-name{display:none}}
+</style>
+</head>
+<body>
+
+<!-- PAGE: SETUP -->
+<div id="page-setup" class="page center-page">
+  <div class="setup-card">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+      <div style="width:50px;height:50px;background:linear-gradient(135deg,#a855f7,#7c3aed);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px">⚙️</div>
+      <div><div style="font-size:18px;font-weight:700">ตั้งค่า Google OAuth Client ID</div><div style="font-size:13px;color:var(--text2)">ทำครั้งเดียว — บันทึกอัตโนมัติในเบราว์เซอร์</div></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.6px;margin-bottom:14px">📋 วิธีสร้าง Google OAuth Client ID</div>
+      <div class="setup-step"><div class="step-num">1</div><div>เปิด <a href="https://console.cloud.google.com" target="_blank" style="color:var(--purple2)">console.cloud.google.com</a> → <strong>New Project</strong></div></div>
+      <div class="setup-step"><div class="step-num">2</div><div><strong>APIs &amp; Services</strong> → <strong>OAuth consent screen</strong> → External → Save</div></div>
+      <div class="setup-step"><div class="step-num">3</div><div><strong>Credentials</strong> → <strong>+ Create Credentials</strong> → <strong>OAuth client ID</strong> → Web application</div></div>
+      <div class="setup-step"><div class="step-num">4</div><div><strong>Authorized JavaScript origins</strong> → เพิ่ม URL ของไซต์ เช่น <code>https://yourdomain.com</code></div></div>
+      <div class="setup-step"><div class="step-num">5</div><div>Copy <strong>Client ID</strong> (ลงท้ายด้วย <code>.apps.googleusercontent.com</code>) → วางด้านล่าง</div></div>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.5px;display:block;margin-bottom:8px">GOOGLE CLIENT ID</label>
+      <input id="setup-client-id-input" type="text" placeholder="xxxxxx.apps.googleusercontent.com"
+        style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:monospace"
+        oninput="document.getElementById('setup-save-btn').disabled=!this.value.trim()">
+      <div id="setup-client-id-err" style="font-size:12px;color:var(--red);margin-top:6px;display:none">⚠️ Client ID ไม่ถูกต้อง</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="setup-save-btn" class="btn btn-primary" onclick="saveClientId()" style="flex:2" disabled>✅ บันทึกและเข้าสู่ระบบ</button>
+      <button class="btn btn-secondary" onclick="enterDemoMode()" style="flex:1">🎮 Demo Mode</button>
+    </div>
+    <div style="margin-top:14px;padding:10px 14px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:8px;font-size:12px;color:var(--text2)">
+      💡 Client ID จะถูกเก็บใน Browser (localStorage) บน Browser นี้เท่านั้น
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: LOGIN -->
+<div id="page-login" class="page center-page">
+  <div class="login-card">
+    <div class="login-logo">🗣</div>
+    <div class="login-title">Form — Forum</div>
+    <div class="login-brand">[GP:PURPLE]</div>
+    <div class="login-sub">กรุณาเข้าสู่ระบบด้วย Google Account<br>เพื่อเข้าถึงระบบ Forum</div>
+    <div class="divider"><span>SIGN IN WITH GOOGLE</span></div>
+    <div id="google-signin-btn"></div>
+    <div id="demo-banner-login" class="demo-banner" style="display:none;margin-top:14px;text-align:left"><span>⚠️</span><span><strong>Demo Mode</strong></span></div>
+    <button id="demo-login-btn" class="btn btn-secondary" onclick="showModal('demo-modal')" style="display:none;width:100%;margin-top:10px;justify-content:center">🎮 Demo Login</button>
+  </div>
+</div>
+
+<!-- PAGE: DENIED -->
+<div id="page-denied" class="page center-page">
+  <div class="denied-card" style="margin:auto">
+    <div class="denied-icon">🚫</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:10px">ไม่มีสิทธิ์เข้าถึง</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:8px;line-height:1.7">อีเมล <strong id="denied-email" style="color:var(--red)"></strong><br>ยังไม่ได้รับอนุญาต</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:28px">กรุณาติดต่อ <span style="color:var(--purple2)">Cherikx</span> เพื่อขอสิทธิ์</div>
+    <button class="btn btn-secondary" onclick="signOut()" style="width:100%;justify-content:center">← กลับหน้า Login</button>
+  </div>
+</div>
+
+<!-- PAGE: MAIN -->
+<div id="page-main" class="page" style="flex-direction:column">
+  <div class="topbar">
+    <div class="topbar-logo">🗣</div>
+    <div class="topbar-title">Form — Forum <span>[GP:PURPLE]</span></div>
+    <div id="admin-badge-wrap"></div>
+    <div class="user-chip">
+      <div class="user-avatar" id="user-avatar">👤</div>
+      <span class="user-name" id="user-name">...</span>
+    </div>
+    <button class="logout-btn" onclick="clearClientId()" style="margin-right:6px;border-color:rgba(245,158,11,.3);color:var(--yellow)" title="เปลี่ยน Google Client ID">⚙️</button>
+    <button class="logout-btn" onclick="signOut()">ออกจากระบบ</button>
+  </div>
+  <div class="tabs-bar" id="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('form',this)">📝 Patch Note</button>
+    <button class="tab-btn" onclick="switchTab('makeforum',this)">🗣 Make Forum</button>
+    <button class="tab-btn" onclick="switchTab('responses',this)">📊 My Responses</button>
+    <button class="tab-btn" onclick="switchTab('history',this)">📜 Edit History</button>
+    <button class="tab-btn admin-only" onclick="switchTab('perms',this)" style="display:none">👥 จัดการสิทธิ์</button>
+    <button class="tab-btn logs-tab" onclick="switchTab('logs',this)" style="display:none">📋 Login Log</button>
+  </div>
+
+  <!-- TAB: PATCH NOTE FORM -->
+  <div id="tab-form" class="tab-content active">
+    <div class="main-content">
+      <div id="demo-form-banner" class="demo-banner" style="display:none"><span>⚠️</span><strong>Demo Mode</strong> — ไม่มีการส่งข้อมูลจริง</div>
+      <div id="edit-mode-banner" class="edit-banner"><span style="font-size:18px">✏️</span><div class="edit-banner-txt">โหมดแก้ไข</div><button class="btn btn-secondary btn-sm" onclick="cancelEdit()">✕ ยกเลิก</button></div>
+      <div class="section-hdr">
+        <div class="section-title">📝 กรอกข้อมูล Patch Note</div>
+        <div class="section-desc">กรอกข้อมูลให้ครบก่อนกดส่ง</div>
+      </div>
+      <div class="form-card">
+        <div class="form-group">
+          <label class="f-label">ชื่อและทีมของผู้ใส่ข้อมูล<span class="req">*</span></label>
+          <div class="name-wrap"><div class="name-prefix">GP :</div><input type="text" class="name-input" id="f-name" placeholder="ชื่อของคุณ เช่น PURPLE, Cherry..." maxlength="30"></div>
+        </div>
+        <div class="form-group">
+          <label class="f-label">บริษัทของผู้ใส่ข้อมูล<span class="req">*</span></label>
+          <div class="btn-group" id="company-group">
+            <button type="button" class="company-btn" onclick="pickCompany(this,'EXE')">🏢 EXE</button>
+            <button type="button" class="company-btn" onclick="pickCompany(this,'COMBO')">🔀 COMBO</button>
+          </div>
+          <input type="hidden" id="f-company">
+        </div>
+        <div class="form-group">
+          <label class="f-label">Patch Note ประจำวันที่<span class="req">*</span></label>
+          <input type="date" class="date-input" id="f-date">
+        </div>
+        <div class="form-group">
+          <label class="f-label">รูปภาพหน้าปก <span style="font-size:11px;color:var(--text3)">(Optional)</span></label>
+          <div id="cover-img-wrap">
+            <label class="img-upload-label" id="cover-img-label" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;background:var(--bg2);border:1px dashed var(--border2);border-radius:8px;padding:10px 18px;font-size:13px;color:var(--text2);transition:all .2s" onmouseenter="this.style.borderColor='var(--purple)'" onmouseleave="this.style.borderColor='var(--border2)'">
+              🖼 เลือกรูปภาพหน้าปก
+              <input type="file" accept="image/*" style="display:none" onchange="handleCoverImg(this)">
+            </label>
+            <div id="cover-img-preview" style="margin-top:10px;display:none">
+              <img id="cover-img-el" style="max-width:100%;max-height:200px;border-radius:10px;display:block;border:1px solid var(--border)">
+              <button type="button" onclick="removeCoverImg()" style="margin-top:6px;background:transparent;border:none;color:var(--red);font-size:12px;cursor:pointer">✕ ลบรูป</button>
+            </div>
+          </div>
+          <input type="hidden" id="f-cover-img">
+        </div>
+      </div>
+      <div id="sections-container"></div>
+      <div id="tables-container"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <div class="add-section-wrap">
+          <button class="btn btn-add" onclick="toggleSectionMenu()" id="add-section-btn">＋ เพิ่มหัวข้อ</button>
+          <div class="add-section-menu hidden" id="section-menu"></div>
+        </div>
+        <button class="btn btn-secondary" onclick="addItemTable()">🎁 สร้างตาราง</button>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="submit-btn" onclick="confirmSubmit()">✉️ ส่งข้อมูล</button>
+        <button class="btn btn-secondary" onclick="confirmClear()">🔄 ล้างข้อมูล</button>
+        <button class="btn btn-secondary" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">✕ ยกเลิกการแก้ไข</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: MAKE FORUM -->
+  <div id="tab-makeforum" class="tab-content">
+    <div class="forum-content">
+      <div id="demo-forum-banner" class="demo-banner" style="display:none"><span>⚠️</span><strong>Demo Mode</strong></div>
+      <div class="section-hdr">
+        <div class="section-title">🗣 Make Forum</div>
+        <div class="section-desc">นำเข้าข้อมูลและสร้างโพสต์ Forum สไตล์ TOSM</div>
+      </div>
+
+      <!-- Source Import -->
+      <div class="form-card">
+        <div class="f-label" style="margin-bottom:14px">📥 นำเข้าข้อมูล</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+          <label class="forum-import-btn">
+            📋 Upload CSV
+            <input type="file" accept=".csv,.tsv" style="display:none" id="forum-csv-input" onchange="handleForumCSV(this)">
+          </label>
+        </div>
+        <!-- Apps Script URL -->
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="f-label">🔗 Apps Script URL <span class="opt">(แนะนำ — ดึงตรงจาก Google Sheet ได้เลย)</span></label>
+          <div style="display:flex;gap:8px">
+            <input type="url" class="f-input" id="apps-script-url" placeholder="https://script.google.com/macros/s/.../exec">
+            <button class="btn btn-secondary" onclick="fetchAppsScriptSheets()" style="white-space:nowrap">🔍 โหลด Sheets</button>
+          </div>
+        </div>
+        <!-- Sheet selector (hidden until loaded) -->
+        <div id="apps-script-sheet-row" style="display:none;margin-bottom:10px">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <label class="f-label" style="margin-bottom:0;white-space:nowrap">📄 เลือก Sheet:</label>
+            <select class="f-input" id="apps-script-sheet-select" style="flex:1;min-width:180px"></select>
+            <button class="btn btn-add" onclick="fetchAppsScriptData()" style="white-space:nowrap">📥 นำเข้าข้อมูล</button>
+          </div>
+        </div>
+        <div id="forum-import-status" style="display:none;margin-top:12px"></div>
+      </div>
+
+      <!-- Raw content paste (fallback) -->
+      <div class="form-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="f-label" style="margin-bottom:0">📋 เนื้อหาดิบ (วางข้อความตรงนี้ได้เลย)</div>
+          <button class="btn btn-add btn-sm" onclick="parseRawContent()">⚡ แบ่ง Sections</button>
+        </div>
+        <textarea class="f-textarea" id="forum-raw-content" rows="6" placeholder="วางเนื้อหาที่คัดลอกมาจากที่ใดก็ได้ แล้วกด 'แบ่ง Sections' เพื่อแยกเป็นหัวข้ออัตโนมัติ หรือสร้าง Section ด้วยตนเองด้านล่าง"></textarea>
+      </div>
+
+      <!-- Forum Meta -->
+      <div class="form-card">
+        <div class="f-label" style="margin-bottom:14px">📝 ข้อมูลโพสต์</div>
+        <div class="form-group">
+          <label class="f-label">หัวข้อ Forum<span class="req">*</span></label>
+          <input type="text" class="f-input" id="forum-title" placeholder="เช่น Patch Note ประจำวันที่ 25/05/2026">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="f-label">ผู้โพสต์<span class="req">*</span></label>
+            <div class="name-wrap"><div class="name-prefix">GP :</div><input type="text" class="name-input" id="forum-author" placeholder="ชื่อของคุณ"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="f-label">วันที่<span class="req">*</span></label>
+            <input type="date" class="date-input" id="forum-date">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px;margin-bottom:0">
+          <label class="f-label">บริษัท<span class="req">*</span></label>
+          <div class="btn-group" id="forum-company-group">
+            <button type="button" class="company-btn" onclick="pickForumCompany(this,'EXE')">🏢 EXE</button>
+            <button type="button" class="company-btn" onclick="pickForumCompany(this,'COMBO')">🔀 COMBO</button>
+          </div>
+          <input type="hidden" id="forum-company">
+        </div>
+      </div>
+
+      <!-- Editable Sections -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:700;color:var(--text2)">✏️ เนื้อหา Forum</div>
+        <button class="btn btn-add btn-sm" onclick="addForumSection()">＋ เพิ่ม Section</button>
+      </div>
+      <div id="forum-sections-list"></div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="btn btn-primary" onclick="generateForumHTML()">⚡ Generate Forum HTML</button>
+        <button class="btn btn-secondary" onclick="clearForum()">🔄 ล้างทั้งหมด</button>
+      </div>
+
+      <!-- Preview -->
+      <div id="forum-preview-card" class="form-card" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+          <div class="f-label" style="margin-bottom:0">🖥 Preview</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-astek btn-sm" onclick="copyForumHTML()">📋 Copy HTML</button>
+            <button class="btn btn-success btn-sm" onclick="saveForumToResponses()">💾 บันทึกใน My Responses</button>
+          </div>
+        </div>
+        <div class="forum-preview-wrap" id="forum-preview-area"></div>
+        <div class="forum-code-wrap">
+          <details>
+            <summary>📄 ดู HTML Code</summary>
+            <textarea id="forum-html-output" class="f-textarea" rows="10" readonly style="font-family:Consolas,monospace;font-size:11px;margin-top:8px"></textarea>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: RESPONSES -->
+  <div id="tab-responses" class="tab-content">
+    <div class="main-content">
+      <div class="section-hdr">
+        <div class="section-title">📊 My Responses</div>
+        <div class="section-desc">ข้อมูลที่กรอกและ Forum ที่สร้างไปแล้วทั้งหมด</div>
+      </div>
+      <div class="sub-tabs">
+        <button class="stab active" onclick="switchRespTab('patch',this)">📝 Patch Notes</button>
+        <button class="stab" onclick="switchRespTab('forum',this)">🗣 Forum Posts</button>
+      </div>
+      <div id="resp-pane-patch" class="stab-pane active"><div id="responses-list"></div></div>
+      <div id="resp-pane-forum" class="stab-pane"><div id="forum-responses-list"></div></div>
+    </div>
+  </div>
+
+  <!-- TAB: HISTORY -->
+  <div id="tab-history" class="tab-content">
+    <div class="main-content">
+      <div class="section-hdr">
+        <div class="section-title">📜 Edit History</div>
+        <div class="section-desc">ประวัติการแก้ไขและการส่งข้อมูล</div>
+      </div>
+      <div class="sub-tabs">
+        <button class="stab active" onclick="switchHistTab('all',this)">📋 ทั้งหมด</button>
+        <button class="stab" onclick="switchHistTab('submit',this)">📝 ส่งข้อมูล</button>
+        <button class="stab" onclick="switchHistTab('edit',this)">✏️ แก้ไข</button>
+        <button class="stab" onclick="switchHistTab('delete',this)">🗑 ลบ</button>
+      </div>
+      <div id="hist-pane-all" class="stab-pane active"><div id="hist-all-list"></div></div>
+      <div id="hist-pane-submit" class="stab-pane"><div id="hist-submit-list"></div></div>
+      <div id="hist-pane-edit" class="stab-pane"><div id="hist-edit-list"></div></div>
+      <div id="hist-pane-delete" class="stab-pane"><div id="hist-delete-list"></div></div>
+    </div>
+  </div>
+
+  <!-- TAB: PERMISSIONS -->
+  <div id="tab-perms" class="tab-content">
+    <div class="main-content">
+      <div class="section-hdr">
+        <div class="section-title">👥 จัดการสิทธิ์การเข้าถึง</div>
+        <div class="section-desc">เพิ่ม / ลบ / เปลี่ยน Role ผู้ใช้งาน</div>
+      </div>
+      <div class="form-card">
+        <div class="f-label" style="margin-bottom:10px">เพิ่มผู้ใช้ใหม่</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <input type="email" class="perm-input" id="new-email" placeholder="email@gmail.com" style="min-width:200px" onkeypress="if(event.key==='Enter'){event.preventDefault();addUser()}">
+          <select class="role-select" id="new-role" style="width:180px">
+            <option value="admin">⚡ Admin</option>
+            <option value="gp_blue">🔵 GP: BLUE</option>
+            <option value="gp_purple" selected>🟣 GP: PURPLE</option>
+            <option value="editor">✏️ Editor</option>
+          </select>
+          <button class="btn btn-add" onclick="addUser()">+ เพิ่ม</button>
+        </div>
+        <div class="f-label" style="margin-bottom:10px">ผู้ใช้ที่มีสิทธิ์ (<span id="email-count">0</span>)</div>
+        <div id="email-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: LOGS -->
+  <div id="tab-logs" class="tab-content">
+    <div class="main-wide">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+        <div class="section-hdr" style="margin-bottom:0">
+          <div class="section-title">📋 Login Log</div>
+          <div class="section-desc">ประวัติการเข้าสู่ระบบทั้งหมด</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary btn-sm" onclick="exportLogs()">⬇️ Export CSV</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmClearLogs()">🗑 ล้าง Log</button>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-val" id="s-total">0</div><div class="stat-label">ทั้งหมด</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-ok" style="color:var(--green)">0</div><div class="stat-label">เข้าสำเร็จ</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-no" style="color:var(--red)">0</div><div class="stat-label">ถูกปฏิเสธ</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead><tr><th>#</th><th>ชื่อ</th><th>Email</th><th>วันเวลา</th><th>สถานะ</th></tr></thead>
+          <tbody id="log-body"><tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3)">ยังไม่มีข้อมูล</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-confirm-submit">
+  <div class="modal"><h3>✉️ ยืนยันการส่งข้อมูล</h3><p>ตรวจสอบข้อมูลให้ถูกต้องก่อนกดยืนยัน<br>หลังส่งแล้วยังสามารถ Edit ได้ใน My Responses</p>
+  <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-confirm-submit')">ยกเลิก</button><button class="btn btn-primary" onclick="doSubmit()">✅ ยืนยัน</button></div></div>
+</div>
+<div class="overlay" id="modal-confirm-clear">
+  <div class="modal"><h3>🔄 ยืนยันการล้างข้อมูล</h3><p>ข้อมูลทั้งหมดในฟอร์มจะถูกล้างออก</p>
+  <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-confirm-clear')">ยกเลิก</button><button class="btn btn-danger" onclick="doClear()">🗑 ล้างข้อมูล</button></div></div>
+</div>
+<div class="overlay" id="modal-confirm-clear-logs">
+  <div class="modal"><h3>🗑 ยืนยันการล้าง Log</h3><p>Log ทั้งหมดจะถูกลบออก</p>
+  <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-confirm-clear-logs')">ยกเลิก</button><button class="btn btn-danger" onclick="doClearLogs()">ล้าง Log</button></div></div>
+</div>
+<div class="overlay" id="demo-modal">
+  <div class="modal"><h3>🎮 Demo Mode Login</h3><p>กรอก Email เพื่อจำลองการ Login</p>
+  <input type="email" class="modal-input" id="demo-email" placeholder="email@gmail.com" onkeypress="if(event.key==='Enter')demoLogin()">
+  <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('demo-modal')">ยกเลิก</button><button class="btn btn-primary" onclick="demoLogin()">เข้าสู่ระบบ</button></div></div>
+</div>
+<div class="toast" id="toast"><span id="t-icon">✅</span><span id="t-msg">สำเร็จ</span></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════
+let GOOGLE_CLIENT_ID = localStorage.getItem('gpp_oauth_client_id')||"YOUR_GOOGLE_CLIENT_ID_HERE";
+const ADMIN_EMAIL    = "cherryyuppi28@gmail.com";
+const INVITE_SECRET  = "GPPURPLE_TOSM_2026";
+
+const SK = {
+  USERS:'gpp_users_v1', LOGS:'gpp_logs_v1',
+  USER:'gpp_user_v1',   SUBS:'gpp_subs_v1',
+  HIST:'gpp_hist_v1',   FORUM:'gpp_forum_v1'
+};
+
+const ROLES = {
+  admin:     {label:'⚡ Admin',      badge:'badge-admin',  color:'#60a5fa'},
+  gp_blue:   {label:'🔵 GP: BLUE',   badge:'badge-blue',   color:'#60a5fa'},
+  gp_purple: {label:'🟣 GP: PURPLE', badge:'badge-purple', color:'#a855f7'},
+  editor:    {label:'✏️ Editor',     badge:'badge-editor', color:'#10b981'}
+};
+const PERMS = {
+  admin:     ['fill','edit','view_all','history','manage','logs'],
+  gp_blue:   ['fill','edit','view_all','history','logs'],
+  gp_purple: ['fill','edit','view_all','history','logs'],
+  editor:    ['fill','edit','view_all','history','logs']
+};
+
+// ═══════════════════════════════════════════
+//  SECTION DEFINITIONS (Patch Note)
+// ═══════════════════════════════════════════
+const SDEFS = {
+  server_merge:{label:'Server - Merge / New Sv.',icon:'🌐',fields:[{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  special_buff:{label:'Special Buff',icon:'⚡',multi:true,addLabel:'+ เพิ่มรายการ',tableLayout:true,fields:[{k:'name',l:'ชื่อ Buff',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'duration',l:'ระยะเวลา',t:'daterange',req:true},{k:'note',l:'หมายเหตุ',t:'textarea',opt:true}]},
+  sub_class:{label:'Sub Class',icon:'⚔️',multi:true,addLabel:'+ เพิ่ม Sub Class',gridLayout:'horizontal',fields:[{k:'order',l:'ลำดับ Class',t:'text',req:true,ph:'เช่น 6th Sub Class',mergeRow:true},{k:'main_class',l:'ชื่อ Class หลัก',t:'text',req:true},{k:'icon',l:'รูป Icon Sub Class',t:'image',req:true},{k:'name',l:'ชื่อ Sub Class',t:'text',req:true}]},
+  new_class:{label:'NEW Class',icon:'🆕',multi:true,addLabel:'+ Sub Class',cardLayout:true,fields:[{k:'class_name',l:'ชื่อ Class',t:'text',req:true,mergeInCard:true},{k:'class_icon',l:'Icon New Class',t:'image',req:true,mergeInCard:true},{k:'sub_name',l:'ชื่อ Sub Class',t:'text',req:true},{k:'sub_icon',l:'รูป Icon Sub Class',t:'image',req:true},{k:'char_image',l:'รูป Class Character',t:'image',opt:true}]},
+  episode_level:{label:'ปลดล็อค Episode / Max Level',icon:'🗺️',fields:[{k:'_h1',l:'📖 ส่วนที่ 1: Episode',t:'header'},{k:'ep_detail',l:'รายละเอียด',t:'textarea',opt:true},{k:'ep_name',l:'ชื่อ Episode',t:'text',opt:true},{k:'ep_image',l:'รูปภาพ',t:'image',opt:true},{k:'_h2',l:'📊 ส่วนที่ 2: Max Level',t:'header'},{k:'lv_max',l:'Max Level',t:'text',opt:true},{k:'lv_detail',l:'รายละเอียด',t:'textarea',opt:true}]},
+  dungeon:{label:'Dungeon',icon:'🏰',multi:true,addLabel:'+ เพิ่มรายการ',tableLayout:true,fields:[{k:'main_name',l:'รายชื่อ Dungeon หลัก',t:'text',req:true,ph:'เช่น Memory Stone'},{k:'sub_name',l:'รายชื่อ Dungeon รอง',t:'text',opt:true},{k:'unlock',l:'เงื่อนไขปลดล็อค',t:'textarea',opt:true},{k:'reward',l:'รางวัลหลัก',t:'textarea',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  field_boss:{label:'Field Boss Event',icon:'👹',fields:[{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  rift:{label:'Rift',icon:'🌀',fields:[{k:'name',l:'ชื่อ Rift',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  dungeon_challenge:{label:'Dungeon Challenge Arcade',icon:'🎮',fields:[{k:'boss',l:'ชื่อ Boss',t:'text',req:true},{k:'unlock',l:'เงื่อนไขปลดล็อค',t:'textarea',req:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  equipment:{label:'Equipment',icon:'🛡️',multi:true,addLabel:'+ เพิ่ม Equipment',tableLayout:true,fields:[{k:'name',l:'ชื่อ Equipment',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'unlock',l:'เงื่อนไขปลดล็อค',t:'textarea',opt:true},{k:'note',l:'หมายเหตุ',t:'textarea',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  limited_gachapon:{label:'Limited Gachapon In-game',icon:'🎴',multi:true,addLabel:'+ เพิ่ม Gachapon',fields:[{k:'type',l:'ประเภท',t:'select',req:true,opts:['God Fellow','Fellow','Kupole','Leticia'],onChange:'onLimitedTypeChange'},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'rate_date',l:'วันที่ Rate Up',t:'daterange_notime',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true},{k:'leticia_mount',l:'ชื่อสัตว์ขี่ประจำตู้',t:'text',opt:true,showWhen:'Leticia'},{k:'leticia_stat',l:'Stat ของสัตว์ขี่',t:'textarea',opt:true,showWhen:'Leticia'}]},
+  gachapon_ingame:{label:'Gachapon In-game',icon:'🎲',multi:true,addLabel:'+ เพิ่ม Gachapon',fields:[{k:'type',l:'ประเภท',t:'select',req:true,opts:['God Fellow','Fellow','Kupole','Leticia'],onChange:'onGachaTypeChange'},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'rate_date',l:'วันที่ Rate Up',t:'daterange_notime',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true},{k:'gf_own',l:'เอฟเฟกต์เมื่อครอบครอง',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_carry',l:'เอฟเฟกต์เมื่อพาติดตัว',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_synergy',l:'Fellow Synergy',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_weapon',l:'อาวุธประจำตัว',t:'text',opt:true,showWhen:'God Fellow'},{k:'gf_awaken',l:'สถานะ Awakening',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_image',l:'รูปภาพ (God Fellow)',t:'image',opt:true,showWhen:'God Fellow'},{k:'leticia_mount',l:'ชื่อสัตว์ขี่ประจำตู้',t:'text',opt:true,showWhen:'Leticia'},{k:'leticia_stat',l:'Stat ของสัตว์ขี่',t:'textarea',opt:true,showWhen:'Leticia'}]},
+  gacha_web:{label:'New Gacha Web Site',icon:'🌐',multi:true,addLabel:'+ เพิ่ม Gachapon',fields:[{k:'type',l:'ประเภท',t:'select',req:true,opts:['God Fellow','Fellow','Kupole'],onChange:'onGachaTypeChange'},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'rate_date',l:'วันที่ Rate Up',t:'daterange_notime',opt:true},{k:'read_more',l:'อ่านรายละเอียดเพิ่มเติม',t:'url',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true},{k:'gf_own',l:'เอฟเฟกต์เมื่อครอบครอง',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_carry',l:'เอฟเฟกต์เมื่อพาติดตัว',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_synergy',l:'Fellow Synergy',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_weapon',l:'อาวุธประจำตัว',t:'text',opt:true,showWhen:'God Fellow'},{k:'gf_awaken',l:'สถานะ Awakening',t:'textarea',opt:true,showWhen:'God Fellow'},{k:'gf_image',l:'รูปภาพ (God Fellow)',t:'image',opt:true,showWhen:'God Fellow'}]},
+  arena:{label:'Arena',icon:'⚔️',fields:[{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  battle_pass:{label:'Battle Pass',icon:'🎫',fields:[{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'duration',l:'ระยะเวลา',t:'daterange',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  furniture:{label:'Furniture',icon:'🪑',fields:[{k:'name',l:'ชื่อ Furniture',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  ingame_events:{label:'In-Game Events',icon:'🎉',multi:true,addLabel:'+ เพิ่ม Event',tableLayout:true,fields:[{k:'name',l:'ชื่อ Event',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'duration',l:'ระยะเวลา',t:'daterange',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  special_event:{label:'Special Event',icon:'🌟',multi:true,addLabel:'+ เพิ่ม Event',tableLayout:true,fields:[{k:'name',l:'ชื่อ Event',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'duration',l:'ระยะเวลา',t:'daterange',opt:true},{k:'read_more',l:'อ่านรายละเอียดเพิ่มเติม',t:'url',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  fixed_bug:{label:'Fixed System / Bug',icon:'🔧',multi:true,addLabel:'+ เพิ่มรายการ',fields:[{k:'status',l:'สถานะ',t:'status_btn',req:true},{k:'name',l:'ชื่อระบบ',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'note',l:'หมายเหตุ',t:'textarea',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  dev_note:{label:'Dev. Note',icon:'📝',multi:true,addLabel:'+ เพิ่มรายการ',fields:[{k:'status',l:'สถานะ',t:'status_btn',req:true},{k:'title',l:'ชื่อหัวข้อ',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'note',l:'หมายเหตุ',t:'textarea',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  known_issue:{label:'Know Issue',icon:'⚠️',multi:true,addLabel:'+ เพิ่มรายการ',fields:[{k:'status',l:'สถานะ',t:'status_btn',req:true},{k:'name',l:'ชื่อ Know Issue',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'note',l:'หมายเหตุ',t:'textarea',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]},
+  other:{label:'อื่นๆ',icon:'📌',fields:[{k:'title',l:'ชื่อหัวข้อ',t:'text',req:true},{k:'detail',l:'รายละเอียด',t:'textarea',req:true},{k:'note',l:'หมายเหตุ',t:'textarea',opt:true},{k:'image',l:'รูปภาพ',t:'image',opt:true}]}
+};
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let isDemoMode=false, currentUser=null, toastTimer=null;
+let editingSubId=null, editMode=false;
+let sectionInstances=[], tableInstances=[];
+let dragSrcId=null;
+// Forum state
+let forumSections=[];
+let forumGeneratedHTML='';
+let editingForumId=null;
+
+// ═══════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════
+function initStorage(){
+  if(!ls(SK.USERS)){
+    ls(SK.USERS,JSON.stringify([{email:ADMIN_EMAIL.toLowerCase(),role:'admin',name:'Cherikx',addedAt:now()}]));
+  } else {
+    const arr=getUsers();
+    if(!arr.find(u=>u.email===ADMIN_EMAIL.toLowerCase())){
+      arr.unshift({email:ADMIN_EMAIL.toLowerCase(),role:'admin',name:'Cherikx',addedAt:now()});
+      ls(SK.USERS,JSON.stringify(arr));
+    }
+  }
+  if(!ls(SK.LOGS)) ls(SK.LOGS,JSON.stringify([]));
+  if(!ls(SK.SUBS)) ls(SK.SUBS,JSON.stringify([]));
+  if(!ls(SK.HIST)) ls(SK.HIST,JSON.stringify([]));
+  if(!ls(SK.FORUM)) ls(SK.FORUM,JSON.stringify([]));
+}
+function ls(k,v){if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}
+function getUsers(){return JSON.parse(ls(SK.USERS)||'[]')}
+function getLogs(){return JSON.parse(ls(SK.LOGS)||'[]')}
+function getSubs(){return JSON.parse(ls(SK.SUBS)||'[]')}
+function getHist(){return JSON.parse(ls(SK.HIST)||'[]')}
+function getForumSubs(){return JSON.parse(ls(SK.FORUM)||'[]')}
+function now(){return new Date().toISOString()}
+
+// ═══════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════
+function getUserRecord(email){
+  const e=email?.toLowerCase().trim();
+  if(e===ADMIN_EMAIL.toLowerCase()) return {email:e,role:'admin',name:'Cherikx'};
+  return getUsers().find(u=>u.email===e);
+}
+function hasPerm(email,perm){const u=getUserRecord(email);if(!u)return false;return(PERMS[u.role]||[]).includes(perm);}
+function isAdmin(email){return hasPerm(email,'manage')}
+function addLog(email,name,status){
+  const logs=getLogs();
+  logs.unshift({id:Date.now(),email:email||'',name:name||'?',timestamp:now(),status,demo:isDemoMode});
+  if(logs.length>1000)logs.length=1000;
+  ls(SK.LOGS,JSON.stringify(logs));
+}
+
+// ═══════════════════════════════════════════
+//  PAGE NAV
+// ═══════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+}
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='responses')renderResponses();
+  if(id==='history')renderHistory();
+  if(id==='perms')renderPerms();
+  if(id==='logs')renderLogs();
+}
+function switchRespTab(tab,btn){
+  document.querySelectorAll('#tab-responses .stab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#tab-responses .stab-pane').forEach(p=>p.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('resp-pane-'+tab)?.classList.add('active');
+  if(tab==='forum')renderForumResponses();
+}
+function switchHistTab(tab,btn){
+  document.querySelectorAll('#tab-history .stab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#tab-history .stab-pane').forEach(p=>p.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('hist-pane-'+tab)?.classList.add('active');
+}
+
+// ═══════════════════════════════════════════
+//  GOOGLE SIGN-IN
+// ═══════════════════════════════════════════
+function handleGoogleCred(resp){
+  try{const d=parseJwt(resp.credential);doLogin(d.email,d.name,d.picture);}
+  catch(e){toast('❌','เกิดข้อผิดพลาด: '+e.message,true);}
+}
+function parseJwt(token){
+  const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+function doLogin(email,name,picture){
+  const e=email.toLowerCase().trim();
+  const u=getUserRecord(e);
+  currentUser={email:e,name,picture,role:u?.role||null};
+  if(u){
+    const arr=getUsers();
+    const idx=arr.findIndex(x=>x.email===e);
+    if(idx>=0){arr[idx].sessionRevoked=false;arr[idx].lastLogin=now();ls(SK.USERS,JSON.stringify(arr));}
+    ls(SK.USER,JSON.stringify({...currentUser,lastActive:now()}));
+    addLog(e,name,'success');
+    loadMain();showPage('main');
+  } else {
+    ls(SK.USER,'');
+    addLog(e,name,'denied');
+    document.getElementById('denied-email').textContent=e;
+    showPage('denied');
+  }
+}
+function loadMain(){
+  if(!currentUser)return;
+  document.getElementById('user-name').textContent=currentUser.name||currentUser.email;
+  const av=document.getElementById('user-avatar');
+  if(currentUser.picture&&!isDemoMode)av.innerHTML=`<img src="${currentUser.picture}" alt="">`;
+  else av.textContent=(currentUser.name||currentUser.email)[0].toUpperCase();
+  const role=ROLES[currentUser.role];
+  document.getElementById('admin-badge-wrap').innerHTML=role?`<span class="badge ${role.badge}">${role.label}`:'';
+  document.querySelectorAll('.admin-only').forEach(el=>{el.style.display=isAdmin(currentUser.email)?'':'none';});
+  document.querySelectorAll('.logs-tab').forEach(el=>{el.style.display=hasPerm(currentUser.email,'logs')?'':'none';});
+  document.getElementById('demo-form-banner').style.display=isDemoMode?'flex':'none';
+  document.getElementById('demo-forum-banner').style.display=isDemoMode?'flex':'none';
+  if(!isDemoMode){
+    try{const s=JSON.parse(ls(SK.USER)||'{}');if(s.email)ls(SK.USER,JSON.stringify({...s,lastActive:now()}));}catch(e){}
+  }
+  buildSectionMenu();
+  if(currentUser.name){
+    const n=document.getElementById('f-name');if(!n.value)n.value=currentUser.name.split(' ')[0];
+    const fn=document.getElementById('forum-author');if(!fn.value)fn.value=currentUser.name.split(' ')[0];
+  }
+  const today=new Date().toISOString().split('T')[0];
+  const fd=document.getElementById('forum-date');if(fd&&!fd.value)fd.value=today;
+}
+function initGoogleBtn(){
+  const cid=localStorage.getItem('gpp_oauth_client_id')||GOOGLE_CLIENT_ID;
+  if(!cid||cid==='YOUR_GOOGLE_CLIENT_ID_HERE'){document.getElementById('demo-login-btn').style.display='flex';return;}
+  const btnEl=document.getElementById('google-signin-btn');
+  if(btnEl)btnEl.innerHTML='';
+  try{
+    google.accounts.id.initialize({client_id:cid,callback:handleGoogleCred});
+    google.accounts.id.renderButton(btnEl,{theme:'outline',size:'large',width:300,locale:'th'});
+    setTimeout(()=>{if(btnEl&&!btnEl.querySelector('iframe,div[role]'))document.getElementById('demo-login-btn').style.display='flex';},2000);
+  }catch(e){document.getElementById('demo-login-btn').style.display='flex';}
+}
+function signOut(){
+  currentUser=null;isDemoMode=false;
+  ls(SK.USER,'');
+  doClear(true);
+  switchTab('form',document.querySelector('.tab-btn'));
+  showPage('login');
+  try{google.accounts.id.disableAutoSelect();}catch(e){}
+  setTimeout(initGoogleBtn,300);
+}
+function enterDemoMode(){
+  isDemoMode=true;
+  document.getElementById('demo-banner-login').style.display='flex';
+  document.getElementById('demo-login-btn').style.display='flex';
+  showPage('login');
+}
+function saveClientId(){
+  const val=(document.getElementById('setup-client-id-input').value||'').trim();
+  const errEl=document.getElementById('setup-client-id-err');
+  if(!val.includes('.apps.googleusercontent.com')){errEl.style.display='block';return;}
+  errEl.style.display='none';
+  localStorage.setItem('gpp_oauth_client_id',val);
+  location.reload();
+}
+function clearClientId(){localStorage.removeItem('gpp_oauth_client_id');location.reload();}
+function demoLogin(){
+  const email=document.getElementById('demo-email').value.trim();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('⚠️','กรุณาใส่ Email ให้ถูกต้อง',true);return;}
+  closeModal('demo-modal');
+  doLogin(email,'Demo ('+email.split('@')[0]+')',null);
+}
+
+// ═══════════════════════════════════════════
+//  INVITE LINK
+// ═══════════════════════════════════════════
+function generateInviteLink(email,role){
+  const clientId=localStorage.getItem('gpp_oauth_client_id')||'';
+  const payload={email:email.toLowerCase(),role,secret:INVITE_SECRET,ts:Date.now(),exp:Date.now()+7*24*60*60*1000,cid:clientId};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const url=location.href.split('#')[0]+'#invite='+encoded;
+  navigator.clipboard.writeText(url).then(()=>{toast('🔗','คัดลอก Invite Link สำหรับ '+email+' แล้ว');}).catch(()=>{prompt('คัดลอก Invite Link:',url);});
+}
+function processInviteHash(){
+  const hash=location.hash;
+  if(!hash.startsWith('#invite='))return false;
+  try{
+    const data=JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+    if(data.secret!==INVITE_SECRET){alert('Invite Link ไม่ถูกต้อง');history.replaceState(null,'',location.pathname+location.search);return false;}
+    if(data.exp&&Date.now()>data.exp){alert('Invite Link หมดอายุแล้ว');history.replaceState(null,'',location.pathname+location.search);return false;}
+    if(data.cid&&data.cid.includes('.apps.googleusercontent.com')){
+      localStorage.setItem('gpp_oauth_client_id',data.cid);
+      GOOGLE_CLIENT_ID=data.cid;
+    }
+    const arr=getUsers();
+    const existing=arr.findIndex(u=>u.email===data.email);
+    if(existing>=0){arr[existing]={...arr[existing],role:data.role,sessionRevoked:false};}
+    else{arr.push({email:data.email,role:data.role,name:'',addedAt:now(),sessionRevoked:false});}
+    ls(SK.USERS,JSON.stringify(arr));
+    history.replaceState(null,'',location.pathname+location.search);
+    toast('✅','เพิ่มสิทธิ์ '+data.email+' สำเร็จ — กรุณา Login');
+    return true;
+  }catch(e){history.replaceState(null,'',location.pathname+location.search);return false;}
+}
+
+// ═══════════════════════════════════════════
+//  FORM: BASIC FIELDS
+// ═══════════════════════════════════════════
+function pickCompany(btn,val){
+  document.querySelectorAll('#company-group .company-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('f-company').value=val;
+}
+function pickForumCompany(btn,val){
+  document.querySelectorAll('#forum-company-group .company-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('forum-company').value=val;
+}
+function handleCoverImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const MAX=1200;let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const data=canvas.toDataURL('image/webp',0.82);
+      document.getElementById('f-cover-img').value=data;
+      document.getElementById('cover-img-el').src=data;
+      document.getElementById('cover-img-preview').style.display='block';
+      document.getElementById('cover-img-label').style.display='none';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function removeCoverImg(){
+  document.getElementById('f-cover-img').value='';
+  document.getElementById('cover-img-el').src='';
+  document.getElementById('cover-img-preview').style.display='none';
+  document.getElementById('cover-img-label').style.display='inline-flex';
+}
+
+// ═══════════════════════════════════════════
+//  DRAG & DROP SECTIONS
+// ═══════════════════════════════════════════
+function initSectionDrag(el,id){
+  el.setAttribute('draggable','true');
+  el.addEventListener('dragstart',e=>{dragSrcId=id;e.dataTransfer.effectAllowed='move';setTimeout(()=>el.classList.add('dragging'),0);});
+  el.addEventListener('dragend',()=>{el.classList.remove('dragging');document.querySelectorAll('.section-block').forEach(b=>b.classList.remove('drag-over'));});
+  el.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';});
+  el.addEventListener('dragenter',e=>{e.preventDefault();if(dragSrcId!==id)el.classList.add('drag-over');});
+  el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+  el.addEventListener('drop',e=>{
+    e.preventDefault();el.classList.remove('drag-over');
+    if(!dragSrcId||dragSrcId===id)return;
+    saveAllSectionsFromDom();
+    const fromIdx=sectionInstances.findIndex(s=>s.id===dragSrcId);
+    const toIdx=sectionInstances.findIndex(s=>s.id===id);
+    if(fromIdx<0||toIdx<0)return;
+    const [moved]=sectionInstances.splice(fromIdx,1);
+    sectionInstances.splice(toIdx,0,moved);
+    reRenderAllSections();dragSrcId=null;
+  });
+}
+function saveAllSectionsFromDom(){sectionInstances.forEach(inst=>saveInstancesFromDom(inst));}
+function reRenderAllSections(){
+  const container=document.getElementById('sections-container');
+  container.innerHTML='';
+  sectionInstances.forEach(inst=>renderSectionBlock(inst));
+}
+
+// ═══════════════════════════════════════════
+//  SECTION MENU
+// ═══════════════════════════════════════════
+function buildSectionMenu(){
+  const menu=document.getElementById('section-menu');
+  menu.innerHTML=Object.entries(SDEFS).filter(([,d])=>!d.hidden).map(([k,d])=>`
+    <div class="add-menu-item" onclick="addSection('${k}');toggleSectionMenu()">
+      <span class="add-menu-icon">${d.icon}</span>${d.label}
+    </div>`).join('');
+}
+function toggleSectionMenu(){document.getElementById('section-menu').classList.toggle('hidden');}
+document.addEventListener('click',e=>{if(!e.target.closest('.add-section-wrap'))document.getElementById('section-menu')?.classList.add('hidden');});
+
+// ═══════════════════════════════════════════
+//  SECTION INSTANCES
+// ═══════════════════════════════════════════
+function addSection(type,data){
+  const id='s_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  const inst={id,type,data:data||{},instances:[{}]};
+  sectionInstances.push(inst);
+  renderSectionBlock(inst);
+}
+function renderSectionBlock(inst){
+  const def=SDEFS[inst.type];
+  const el=document.createElement('div');
+  el.className='section-block';el.id='blk_'+inst.id;
+  const hasMergeRows=def.fields&&def.fields.some(f=>f.mergeRow);
+  el.innerHTML=`
+    <div class="section-block-header" onclick="toggleBlock('${inst.id}')">
+      <span style="cursor:grab;color:var(--text3);font-size:16px;padding:0 6px 0 0;user-select:none" onclick="event.stopPropagation()" title="ลากเพื่อย้าย">⠿</span>
+      <span class="section-block-icon">${def.icon}</span>
+      <span class="section-block-label">${def.label}</span>
+      <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();removeSection('${inst.id}')" style="margin-left:auto">🗑 ลบ</button>
+    </div>
+    <div class="section-block-body" id="body_${inst.id}">
+      ${hasMergeRows?`<div id="merge_fields_${inst.id}" style="margin-bottom:14px"></div>`:''}
+      <div id="instances_${inst.id}"></div>
+      ${def.multi?`<button class="btn btn-add btn-sm" onclick="addInstance('${inst.id}')">${def.addLabel}</button>`:''}
+    </div>`;
+  document.getElementById('sections-container').appendChild(el);
+  initSectionDrag(el,inst.id);
+  if(hasMergeRows){
+    const mergeEl=document.getElementById('merge_fields_'+inst.id);
+    let html='';
+    def.fields.filter(f=>f.mergeRow).forEach(f=>{html+=renderField(f,(inst.instances[0]||{})[f.k]||'',inst.id+'_0');});
+    mergeEl.innerHTML=html;
+  }
+  renderInstances(inst);
+}
+function saveInstancesFromDom(inst){
+  const def=SDEFS[inst.type];
+  inst.instances.forEach((data,idx)=>{
+    const iid=inst.id+'_'+idx;
+    def.fields.forEach(f=>{
+      if(f.t==='header')return;
+      if(f.mergeRow||f.mergeInCard){
+        if(idx===0){const el=document.getElementById('f_'+iid+'_'+f.k);if(el)data[f.k]=el.value;}
+        else{data[f.k]=inst.instances[0][f.k];}
+        return;
+      }
+      const el=document.getElementById('f_'+iid+'_'+f.k);if(!el)return;
+      if(f.t==='daterange'||f.t==='daterange_notime'){try{data[f.k]=JSON.parse(el.value||'{}');}catch(e){data[f.k]={};}}
+      else{data[f.k]=el.value;}
+    });
+  });
+}
+function renderInstances(inst){
+  const def=SDEFS[inst.type];
+  if(def.gridLayout==='horizontal')return renderGridInstances(inst);
+  if(def.cardLayout)return renderCardInstances(inst);
+  if(def.tableLayout)return renderTableInstances(inst);
+  renderDefaultInstances(inst);
+}
+function renderDefaultInstances(inst){
+  const def=SDEFS[inst.type];
+  const wrap=document.getElementById('instances_'+inst.id);
+  wrap.innerHTML='';
+  inst.instances.forEach((data,idx)=>{
+    const iid=inst.id+'_'+idx;
+    const div=document.createElement('div');
+    div.className='instance-block';div.id='inst_'+iid;
+    if(def.multi)div.innerHTML=`<div class="instance-num">${def.label} #${idx+1} ${inst.instances.length>1?`<button class="btn btn-danger btn-sm" onclick="removeInstance('${inst.id}',${idx})" style="float:right">✕</button>`:''}</div>`;
+    def.fields.forEach(f=>{
+      if(f.t==='header'){div.innerHTML+=`<div class="section-sub-header">${f.l}</div>`;return;}
+      if(f.mergeRow)return;
+      div.innerHTML+=renderField(f,data[f.k],iid);
+    });
+    wrap.appendChild(div);
+    def.fields.filter(f=>f.showWhen).forEach(()=>updateConditional(iid,def,data));
+  });
+}
+function renderGridInstances(inst){
+  const def=SDEFS[inst.type];
+  const wrap=document.getElementById('instances_'+inst.id);
+  const n=inst.instances.length;
+  const fields=def.fields.filter(f=>f.t!=='header'&&!f.mergeRow);
+  let html=`<div class="grid-tbl-wrap"><table class="grid-tbl"><thead><tr><th>ฟิลด์</th>`;
+  inst.instances.forEach((_,i)=>{
+    const rmBtn=n>1?`<br><button class="btn btn-danger btn-sm" style="margin-top:5px;font-size:10px" onclick="removeInstance('${inst.id}',${i})">✕ ลบ</button>`:'';
+    html+=`<th>${def.label} #${i+1}${rmBtn}</th>`;
+  });
+  html+=`</tr></thead><tbody>`;
+  fields.forEach(f=>{
+    html+=`<tr><td class="row-hdr">${f.l}${f.req?'<span class="req">*</span>':''}</td>`;
+    inst.instances.forEach((data,i)=>{html+=`<td>${renderFieldInline(f,data[f.k],inst.id+'_'+i)}</td>`;});
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  wrap.innerHTML=html;
+}
+function renderCardInstances(inst){
+  const def=SDEFS[inst.type];
+  const wrap=document.getElementById('instances_'+inst.id);
+  if(!inst.instances.length)inst.instances=[{}];
+  const data0=inst.instances[0];const iid0=inst.id+'_0';
+  const hasMerge=def.fields.some(f=>f.mergeInCard);
+  const leftFields=hasMerge?def.fields.filter(f=>f.mergeInCard&&f.t!=='header'):def.fields.filter(f=>f.t!=='image'&&f.t!=='header');
+  const imgFields=def.fields.filter(f=>f.t==='image'&&!f.mergeInCard);
+  const perTextFields=hasMerge?def.fields.filter(f=>!f.mergeInCard&&f.t!=='image'&&f.t!=='header'):[];
+  let leftHtml='';
+  leftFields.forEach(f=>{
+    leftHtml+=`<div class="form-group"><label class="f-label">${f.l}${f.req?'<span class="req">*</span>':''}${f.opt?'<span class="opt">(Optional)</span>':''}</label>${renderFieldInline(f,data0[f.k],iid0)}</div>`;
+  });
+  let rightHtml='';
+  inst.instances.forEach((data,i)=>{
+    const iid=inst.id+'_'+i;
+    if(inst.instances.length>1)rightHtml+=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid var(--border)"><button class="btn btn-danger btn-sm" onclick="removeInstance('${inst.id}',${i})" style="float:right">✕</button>Sub Class #${i+1}</div>`;
+    perTextFields.forEach(f=>{
+      rightHtml+=`<div class="form-group"><label class="f-label">${f.l}${f.req?'<span class="req">*</span>':''}</label>${renderFieldInline(f,data[f.k],iid)}</div>`;
+    });
+    imgFields.forEach(f=>{
+      const fid=`f_${iid}_${f.k}`;
+      rightHtml+=`<div class="form-group"><label class="f-label">${f.l}${f.req?'<span class="req">*</span>':''}</label>${renderImageField(fid,data[f.k])}</div>`;
+    });
+    if(i<inst.instances.length-1)rightHtml+=`<hr style="border:none;border-top:1px solid var(--border);margin:14px 0">`;
+  });
+  wrap.innerHTML=`<div class="card-grid-2"><div>${leftHtml}</div><div>${rightHtml}</div></div>`;
+}
+function renderTableInstances(inst){
+  const def=SDEFS[inst.type];
+  const wrap=document.getElementById('instances_'+inst.id);
+  const fields=def.fields.filter(f=>f.t!=='header');
+  let html=`<div class="sec-tbl-wrap"><table class="sec-tbl"><thead><tr><th style="width:36px">#</th>`;
+  fields.forEach(f=>html+=`<th>${f.l}${f.req?'<span class="req">*</span>':''}</th>`);
+  html+=`<th style="width:44px"></th></tr></thead><tbody>`;
+  inst.instances.forEach((data,idx)=>{
+    const iid=inst.id+'_'+idx;
+    html+=`<tr><td class="n-col">${idx+1}</td>`;
+    fields.forEach(f=>html+=`<td>${renderFieldInline(f,data[f.k],iid)}</td>`);
+    html+=`<td>${inst.instances.length>1?`<button class="btn btn-danger btn-sm" onclick="removeInstance('${inst.id}',${idx})">✕</button>`:''}</td></tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  wrap.innerHTML=html;
+  inst.instances.forEach((data,i)=>{def.fields.filter(f=>f.showWhen).forEach(()=>updateConditional(inst.id+'_'+i,def,data));});
+}
+function renderFieldInline(f,val,iid){
+  const fid=`f_${iid}_${f.k}`;
+  switch(f.t){
+    case 'text': return `<input type="text" class="f-input" id="${fid}" value="${esc(val||'')}" placeholder="${f.ph||''}">`;
+    case 'textarea': return `<textarea class="f-textarea" id="${fid}" placeholder="${f.ph||''}" style="min-height:60px">${esc(val||'')}</textarea>`;
+    case 'url': return `<input type="url" class="f-input" id="${fid}" value="${esc(val||'')}" placeholder="https://...">`;
+    case 'select':{const opts=f.opts.map(o=>`<option value="${o}"${val===o?' selected':''}>${o}</option>`).join('');const onch=f.onChange?`onchange="${f.onChange}(this,'${iid}')"`:'' ;return `<select class="f-select" id="${fid}" ${onch}>${opts}</select>`;}
+    case 'image': return renderImageField(fid,val);
+    case 'daterange': return renderDateRange(fid,val,true);
+    case 'daterange_notime': return renderDateRange(fid,val,false);
+    case 'status_btn': return renderStatusBtn(fid,val);
+    default: return '';
+  }
+}
+function renderField(f,val,iid){
+  const fid=`f_${iid}_${f.k}`;
+  const opt=f.opt?'<span class="opt">(Optional)</span>':'';
+  const req=f.req?'<span class="req">*</span>':'';
+  let input='';
+  switch(f.t){
+    case 'text': input=`<input type="text" class="f-input" id="${fid}" value="${esc(val||'')}" placeholder="${f.ph||''}">`;break;
+    case 'textarea': input=`<textarea class="f-textarea" id="${fid}" placeholder="${f.ph||''}">${esc(val||'')}</textarea>`;break;
+    case 'url': input=`<input type="url" class="f-input" id="${fid}" value="${esc(val||'')}" placeholder="https://...">`;break;
+    case 'select':{const opts=f.opts.map(o=>`<option value="${o}"${val===o?' selected':''}>${o}</option>`).join('');const onch=f.onChange?`onchange="${f.onChange}(this,'${iid}')"`:'' ;input=`<select class="f-select" id="${fid}" ${onch}>${opts}</select>`;break;}
+    case 'image': input=renderImageField(fid,val);break;
+    case 'daterange': input=renderDateRange(fid,val,true);break;
+    case 'daterange_notime': input=renderDateRange(fid,val,false);break;
+    case 'status_btn': input=renderStatusBtn(fid,val);break;
+    default: input='';
+  }
+  const sw=f.showWhen?`data-show-when="${f.showWhen}" style="display:none"`:'';
+  return `<div class="form-group" id="fg_${iid}_${f.k}" ${sw}><label class="f-label">${f.l}${req}${opt}</label>${input}</div>`;
+}
+function renderImageField(fid,val){
+  const hasImg=val&&val.startsWith('data:');
+  const hasUrl=val&&!val.startsWith('data:');
+  return `<div class="img-upload-wrap">
+    <div class="img-tabs">
+      <button type="button" class="img-tab ${!hasUrl?'active':''}" onclick="imgTabSwitch('${fid}','file',this)">📁 Upload</button>
+      <button type="button" class="img-tab ${hasUrl?'active':''}" onclick="imgTabSwitch('${fid}','url',this)">🔗 Link</button>
+    </div>
+    <div id="${fid}_file_wrap" style="${hasUrl?'display:none':''}">
+      <input type="file" accept="image/*" style="display:none" id="${fid}_file" onchange="handleImgUpload(this,'${fid}')">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('${fid}_file').click()">📁 เลือกไฟล์</button>
+    </div>
+    <div id="${fid}_url_wrap" style="${!hasUrl?'display:none':''}">
+      <input type="url" class="f-input" id="${fid}_url" placeholder="https://..." value="${esc(hasUrl?val:'')}" oninput="imgUrlChange('${fid}',this.value)" style="margin-top:6px">
+    </div>
+    <input type="hidden" id="${fid}" value="${esc(val||'')}">
+    <div class="img-preview-wrap" id="${fid}_preview" style="${val?'display:block':''}">
+      <img src="${val||''}" class="img-preview" id="${fid}_img" onerror="this.style.display='none'">
+      <div class="img-size-badge" id="${fid}_size"></div>
+      <button type="button" class="img-clear" onclick="clearImg('${fid}')">✕ ลบรูป</button>
+    </div>
+  </div>`;
+}
+function renderDateRange(fid,val,withTime){
+  const v=val||{};
+  return `<div><div class="daterange-wrap">
+    <div class="daterange-row"><label>เริ่มต้น</label>
+      <input type="date" class="date-input" id="${fid}_sd" value="${v.sd||''}" oninput="updateDatePreview('${fid}')">
+      ${withTime?`<input type="time" class="date-input" id="${fid}_st" value="${v.st||''}" oninput="updateDatePreview('${fid}')" style="margin-top:5px">`:''}
+    </div>
+    <div class="daterange-row"><label>สิ้นสุด</label>
+      <input type="date" class="date-input" id="${fid}_ed" value="${v.ed||''}" oninput="updateDatePreview('${fid}')">
+      ${withTime?`<input type="time" class="date-input" id="${fid}_et" value="${v.et||''}" oninput="updateDatePreview('${fid}')" style="margin-top:5px">`:''}
+    </div>
+  </div>
+  <div class="daterange-preview" id="${fid}_preview">${formatDateRange(v,withTime)}</div>
+  <input type="hidden" id="${fid}" value='${JSON.stringify(v)}'></div>`;
+}
+function updateDatePreview(fid){
+  const sd=val_(fid+'_sd'),st=val_(fid+'_st'),ed=val_(fid+'_ed'),et=val_(fid+'_et');
+  const withTime=!!document.getElementById(fid+'_st');
+  const v={sd,st,ed,et};
+  const h=document.getElementById(fid);if(h)h.value=JSON.stringify(v);
+  const pr=document.getElementById(fid+'_preview');if(pr)pr.textContent=formatDateRange(v,withTime);
+}
+function formatDateRange(v,withTime){
+  if(!v||(!v.sd&&!v.ed))return'ยังไม่ได้เลือกวันที่';
+  const fmtD=d=>{if(!d)return'?';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`};
+  const fmtT=t=>t?`เวลา: ${t} น.`:'';
+  if(withTime)return`เริ่ม: ${fmtD(v.sd)} ${fmtT(v.st)} สิ้นสุด: ${fmtD(v.ed)} ${fmtT(v.et)}`;
+  return`เริ่ม: ${fmtD(v.sd)} สิ้นสุด: ${fmtD(v.ed)}`;
+}
+function val_(id){const el=document.getElementById(id);return el?el.value:'';}
+function renderStatusBtn(fid,val){
+  const opts=['แก้ไขแล้ว','กำลังปรับปรุง','ปิดระบบ'];
+  const btns=opts.map(o=>`<button type="button" class="status-btn${val===o?' active':''}" data-val="${o}" onclick="pickStatus('${fid}','${o}',this)">${o}</button>`).join('');
+  return`<div class="status-btns">${btns}<input type="hidden" id="${fid}" value="${val||''}"></div>`;
+}
+function pickStatus(fid,val,btn){
+  document.getElementById(fid).value=val;
+  btn.closest('.status-btns').querySelectorAll('.status-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function imgTabSwitch(fid,tab,btn){
+  btn.parentElement.querySelectorAll('.img-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(fid+'_file_wrap').style.display=tab==='file'?'':'none';
+  document.getElementById(fid+'_url_wrap').style.display=tab==='url'?'':'none';
+}
+function imgUrlChange(fid,url){
+  const h=document.getElementById(fid);if(h)h.value=url;
+  const pw=document.getElementById(fid+'_preview');
+  const pi=document.getElementById(fid+'_img');
+  if(url){pw.style.display='block';if(pi){pi.src=url;pi.style.display='';}}
+  else{pw.style.display='none';}
+}
+function clearImg(fid){
+  const h=document.getElementById(fid);if(h)h.value='';
+  const pw=document.getElementById(fid+'_preview');if(pw)pw.style.display='none';
+  const fu=document.getElementById(fid+'_file');if(fu)fu.value='';
+  const uu=document.getElementById(fid+'_url');if(uu)uu.value='';
+}
+async function handleImgUpload(input,fid){
+  const file=input.files[0];if(!file)return;
+  const btn=input.nextElementSibling;
+  if(btn)btn.textContent='⏳ กำลังแปลง...';
+  try{
+    const dataUrl=await convertToWebP(file);
+    const h=document.getElementById(fid);if(h)h.value=dataUrl;
+    const pw=document.getElementById(fid+'_preview');if(pw)pw.style.display='block';
+    const pi=document.getElementById(fid+'_img');if(pi){pi.src=dataUrl;pi.style.display='';}
+    const sz=document.getElementById(fid+'_size');if(sz){const kb=Math.round(dataUrl.length*0.75/1024);sz.textContent=`WebP • ${kb} KB`;}
+    if(btn)btn.textContent='📁 เลือกไฟล์';
+    toast('✅','แปลงเป็น WebP สำเร็จ');
+  }catch(e){toast('❌','แปลงไฟล์ไม่สำเร็จ: '+e.message,true);if(btn)btn.textContent='📁 เลือกไฟล์';}
+}
+async function convertToWebP(file){
+  return new Promise((res,rej)=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{
+      let w=img.width,h=img.height;if(w>900){h=Math.round(h*900/w);w=900;}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      c.toBlob(blob=>{if(!blob){rej(new Error('Conversion failed'));return;}const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(blob);},'image/webp',0.82);
+    };
+    img.onerror=()=>rej(new Error('Load failed'));
+    img.src=url;
+  });
+}
+function toggleBlock(id){document.getElementById('body_'+id).classList.toggle('hidden');}
+function removeSection(id){sectionInstances=sectionInstances.filter(s=>s.id!==id);document.getElementById('blk_'+id)?.remove();}
+function addInstance(id){const inst=sectionInstances.find(s=>s.id===id);if(inst){saveInstancesFromDom(inst);inst.instances.push({});renderInstances(inst);}}
+function removeInstance(id,idx){const inst=sectionInstances.find(s=>s.id===id);if(inst&&inst.instances.length>1){saveInstancesFromDom(inst);inst.instances.splice(idx,1);renderInstances(inst);}}
+function onGachaTypeChange(sel,iid){const def=findDefByIid(iid);if(!def)return;updateConditional(iid,def,{type:sel.value});}
+function onLimitedTypeChange(sel,iid){
+  const def=findDefByIid(iid);if(!def)return;
+  const val=sel.value;
+  def.fields.filter(f=>f.showWhen).forEach(f=>{const fg=document.getElementById('fg_'+iid+'_'+f.k);if(fg)fg.style.display=(val===f.showWhen)?'':'none';});
+}
+function findDefByIid(iid){const inst=sectionInstances.find(s=>iid.startsWith(s.id));return inst?SDEFS[inst.type]:null;}
+function updateConditional(iid,def,data){
+  const selEl=document.getElementById('f_'+iid+'_type');
+  const curVal=selEl?selEl.value:(data&&data.type)||'';
+  def.fields.filter(f=>f.showWhen).forEach(f=>{const fg=document.getElementById('fg_'+iid+'_'+f.k);if(fg)fg.style.display=(curVal===f.showWhen)?'':'none';});
+}
+
+// ═══════════════════════════════════════════
+//  ITEM TABLE BUILDER
+// ═══════════════════════════════════════════
+function addItemTable(){
+  const id='t_'+Date.now();
+  tableInstances.push({id,rows:[{img:'',name:'',qty:'',exchange:''}]});
+  renderTable(id);
+}
+function renderTable(id){
+  const tbl=tableInstances.find(t=>t.id===id);if(!tbl)return;
+  const existing=document.getElementById('tbl_'+id);
+  const el=existing||document.createElement('div');
+  el.id='tbl_'+id;el.className='form-card';
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <span style="font-weight:700;font-size:14px">🎁 ตารางไอเทม</span>
+    <button class="btn btn-danger btn-sm" onclick="removeTable('${id}')">🗑 ลบ</button>
+  </div><div style="overflow-x:auto"><table class="item-table">
+    <thead><tr><th>รูปภาพ</th><th>ชื่อไอเทม</th><th>จำนวน</th><th>แลกเปลี่ยน</th><th></th></tr></thead>
+    <tbody id="tbl_body_${id}">${tbl.rows.map((r,i)=>`<tr>
+      <td><input class="item-input" placeholder="URL รูป" value="${esc(r.img)}" oninput="tblUpdate('${id}',${i},'img',this.value)" style="width:120px"></td>
+      <td><input class="item-input" placeholder="ชื่อไอเทม" value="${esc(r.name)}" oninput="tblUpdate('${id}',${i},'name',this.value)"></td>
+      <td><input class="item-input" placeholder="จำนวน" value="${esc(r.qty)}" oninput="tblUpdate('${id}',${i},'qty',this.value)" style="width:80px"></td>
+      <td><select class="item-input" onchange="tblUpdate('${id}',${i},'exchange',this.value)" style="cursor:pointer"><option value="">—</option><option value="✅"${r.exchange==='✅'?' selected':''}>✅</option><option value="❌"${r.exchange==='❌'?' selected':''}>❌</option></select></td>
+      <td><button class="btn btn-danger btn-sm" onclick="tblRemoveRow('${id}',${i})">✕</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>
+  <button class="btn btn-add btn-sm" onclick="tblAddRow('${id}')" style="margin-top:10px">+ เพิ่มแถว</button>`;
+  if(!existing)document.getElementById('tables-container').appendChild(el);
+}
+function tblUpdate(id,idx,key,val){const t=tableInstances.find(t=>t.id===id);if(t&&t.rows[idx])t.rows[idx][key]=val;}
+function tblAddRow(id){const t=tableInstances.find(t=>t.id===id);if(t){t.rows.push({img:'',name:'',qty:'',exchange:''});renderTable(id);}}
+function tblRemoveRow(id,idx){const t=tableInstances.find(t=>t.id===id);if(t&&t.rows.length>1){t.rows.splice(idx,1);renderTable(id);}}
+function removeTable(id){tableInstances=tableInstances.filter(t=>t.id!==id);document.getElementById('tbl_'+id)?.remove();}
+
+// ═══════════════════════════════════════════
+//  COLLECT FORM DATA
+// ═══════════════════════════════════════════
+function collectSections(){
+  return sectionInstances.map(inst=>{
+    const def=SDEFS[inst.type];
+    const instances=inst.instances.map((_,idx)=>{
+      const iid=inst.id+'_'+idx;
+      const data={};
+      def.fields.forEach(f=>{
+        if(f.t==='header')return;
+        if(f.mergeRow||f.mergeInCard){
+          const el=document.getElementById('f_'+inst.id+'_0_'+f.k);
+          if(el){if(f.t==='daterange'||f.t==='daterange_notime'){try{data[f.k]=JSON.parse(el.value||'{}');}catch{data[f.k]={};}}else{data[f.k]=el.value;}}
+          return;
+        }
+        const el=document.getElementById('f_'+iid+'_'+f.k);if(!el)return;
+        if(f.t==='daterange'||f.t==='daterange_notime'){try{data[f.k]=JSON.parse(el.value||'{}');}catch{data[f.k]={};}}
+        else{data[f.k]=el.value;}
+      });
+      return data;
+    });
+    return{type:inst.type,label:def.label,icon:def.icon,instances};
+  });
+}
+
+// ═══════════════════════════════════════════
+//  SUBMIT PATCH NOTE
+// ═══════════════════════════════════════════
+function confirmSubmit(){
+  const name=document.getElementById('f-name').value.trim();
+  const company=document.getElementById('f-company').value;
+  const date=document.getElementById('f-date').value;
+  if(!name){toast('⚠️','กรุณาใส่ชื่อของคุณ',true);return;}
+  if(!company){toast('⚠️','กรุณาเลือกบริษัท',true);return;}
+  if(!date){toast('⚠️','กรุณาเลือกวันที่',true);return;}
+  if(editMode){doSaveEdit();return;}
+  showModal('modal-confirm-submit');
+}
+function doSubmit(){
+  closeModal('modal-confirm-submit');
+  const name=document.getElementById('f-name').value.trim();
+  const company=document.getElementById('f-company').value;
+  const date=document.getElementById('f-date').value;
+  const coverImage=document.getElementById('f-cover-img').value||'';
+  const sections=collectSections();
+  const tables=tableInstances.map(t=>({id:t.id,rows:[...t.rows]}));
+  const sub={id:'sub_'+Date.now(),submittedBy:{email:currentUser.email,name:currentUser.name},gpName:'GP: '+name,company,patchDate:date,coverImage,sections,tables,timestamp:now(),editHistory:[]};
+  const subs=getSubs();subs.unshift(sub);ls(SK.SUBS,JSON.stringify(subs));
+  const hist=getHist();hist.unshift({action:'submit',subId:sub.id,patchDate:date,editedBy:{email:currentUser.email,name:currentUser.name},editedAt:now(),changes:'ส่งข้อมูลใหม่: GP: '+name});
+  ls(SK.HIST,JSON.stringify(hist));
+  doClear(true);
+  switchTab('responses',document.querySelectorAll('.tab-btn')[2]);
+  toast('✅','ส่งข้อมูลสำเร็จ! บันทึกใน My Responses แล้ว');
+}
+function deleteSubmission(subId){
+  if(!confirm('ต้องการลบข้อมูลนี้? ไม่สามารถกู้คืนได้'))return;
+  const sub=getSubs().find(s=>s.id===subId);if(!sub)return;
+  const hist=getHist();
+  hist.unshift({action:'delete',subId,patchDate:sub.patchDate,editedBy:{email:currentUser.email,name:currentUser.name},editedAt:now(),changes:'ลบ Patch Note: '+sub.gpName});
+  ls(SK.HIST,JSON.stringify(hist));
+  ls(SK.SUBS,JSON.stringify(getSubs().filter(s=>s.id!==subId)));
+  renderResponses();toast('🗑','ลบข้อมูลแล้ว');
+}
+function confirmClear(){showModal('modal-confirm-clear');}
+function doClear(silent){
+  if(!silent)closeModal('modal-confirm-clear');
+  editMode=false;editingSubId=null;
+  const banner=document.getElementById('edit-mode-banner');if(banner)banner.classList.remove('show');
+  const sBtn=document.getElementById('submit-btn');if(sBtn)sBtn.textContent='✉️ ส่งข้อมูล';
+  const cBtn=document.getElementById('cancel-edit-btn');if(cBtn)cBtn.style.display='none';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-date').value='';
+  document.getElementById('f-company').value='';
+  document.querySelectorAll('#company-group .company-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('f-cover-img').value='';
+  document.getElementById('cover-img-el').src='';
+  document.getElementById('cover-img-preview').style.display='none';
+  document.getElementById('cover-img-label').style.display='inline-flex';
+  sectionInstances=[];document.getElementById('sections-container').innerHTML='';
+  tableInstances=[];document.getElementById('tables-container').innerHTML='';
+  if(!silent)toast('🔄','ล้างข้อมูลแล้ว');
+}
+
+// ═══════════════════════════════════════════
+//  EDIT SYSTEM
+// ═══════════════════════════════════════════
+function openEdit(subId){
+  const sub=getSubs().find(s=>s.id===subId);if(!sub)return;
+  doClear(true);
+  editMode=true;editingSubId=subId;
+  document.getElementById('f-name').value=sub.gpName?.replace('GP: ','')||'';
+  document.getElementById('f-date').value=sub.patchDate||'';
+  const comp=sub.company||'';
+  document.getElementById('f-company').value=comp;
+  document.querySelectorAll('#company-group .company-btn').forEach(b=>{b.classList.toggle('selected',b.textContent.includes(comp));});
+  const ci=sub.coverImage||'';
+  document.getElementById('f-cover-img').value=ci;
+  if(ci){document.getElementById('cover-img-el').src=ci;document.getElementById('cover-img-preview').style.display='block';document.getElementById('cover-img-label').style.display='none';}
+  else{document.getElementById('cover-img-preview').style.display='none';document.getElementById('cover-img-label').style.display='inline-flex';}
+  sectionInstances=[];document.getElementById('sections-container').innerHTML='';
+  (sub.sections||[]).forEach(sec=>{
+    const type=sec.type||Object.keys(SDEFS).find(k=>SDEFS[k].label===sec.label);
+    if(!type||!SDEFS[type])return;
+    const id='s_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+    const inst={id,type,data:{},instances:(sec.instances&&sec.instances.length?sec.instances:[{}])};
+    sectionInstances.push(inst);renderSectionBlock(inst);
+  });
+  tableInstances=[];document.getElementById('tables-container').innerHTML='';
+  (sub.tables||[]).forEach(t=>{
+    const tid='t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5);
+    tableInstances.push({id:tid,rows:[...(t.rows||[])]});renderTable(tid);
+  });
+  const pdate=sub.patchDate?sub.patchDate.split('-').reverse().join('/'):'?';
+  const banner=document.getElementById('edit-mode-banner');
+  if(banner){banner.querySelector('.edit-banner-txt').innerHTML=`<strong>โหมดแก้ไข</strong> — Patch Note: ${pdate} (${sub.gpName})`;banner.classList.add('show');}
+  const sBtn=document.getElementById('submit-btn');if(sBtn)sBtn.textContent='💾 บันทึกการแก้ไข';
+  const cBtn=document.getElementById('cancel-edit-btn');if(cBtn)cBtn.style.display='';
+  switchTab('form',document.querySelector('.tab-btn'));
+  toast('✏️','โหมดแก้ไข — โหลดข้อมูลแล้ว');
+}
+function cancelEdit(){doClear(true);switchTab('responses',document.querySelectorAll('.tab-btn')[2]);toast('ℹ️','ยกเลิกการแก้ไขแล้ว');}
+function doSaveEdit(){
+  const sub=getSubs().find(s=>s.id===editingSubId);if(!sub)return;
+  const newName=document.getElementById('f-name').value.trim();
+  const newDate=document.getElementById('f-date').value;
+  const newComp=document.getElementById('f-company').value;
+  const newSections=collectSections();
+  const newTables=tableInstances.map(t=>({id:t.id,rows:[...t.rows]}));
+  const changeDesc=[];
+  if(newName&&'GP: '+newName!==sub.gpName)changeDesc.push(`ชื่อ: ${sub.gpName}→GP: ${newName}`);
+  if(newDate&&newDate!==sub.patchDate)changeDesc.push(`วันที่: ${sub.patchDate}→${newDate}`);
+  if(newComp&&newComp!==sub.company)changeDesc.push(`บริษัท: ${sub.company}→${newComp}`);
+  if(newSections.length)changeDesc.push('แก้ไขเนื้อหา');
+  if(newName)sub.gpName='GP: '+newName;
+  if(newDate)sub.patchDate=newDate;
+  if(newComp)sub.company=newComp;
+  sub.sections=newSections;sub.tables=newTables;
+  sub.editHistory=sub.editHistory||[];
+  sub.editHistory.push({editedBy:{email:currentUser.email,name:currentUser.name},editedAt:now(),changes:changeDesc.join(', ')||'แก้ไขข้อมูล'});
+  const hist=getHist();
+  hist.unshift({action:'edit',subId:editingSubId,patchDate:sub.patchDate,editedBy:{email:currentUser.email,name:currentUser.name},editedAt:now(),changes:changeDesc.join(', ')||'แก้ไขข้อมูล'});
+  ls(SK.HIST,JSON.stringify(hist));
+  const subs=getSubs().map(s=>s.id===editingSubId?sub:s);
+  ls(SK.SUBS,JSON.stringify(subs));
+  doClear(true);
+  switchTab('responses',document.querySelectorAll('.tab-btn')[2]);
+  toast('✅','บันทึกการแก้ไขสำเร็จ');
+}
+
+// ═══════════════════════════════════════════
+//  VIEW RESPONSES (PATCH NOTES)
+// ═══════════════════════════════════════════
+function renderResponses(){
+  const subs=getSubs();
+  const viewAll=hasPerm(currentUser?.email,'view_all');
+  const myEmail=currentUser?.email;
+  const filtered=viewAll?subs:subs.filter(s=>s.submittedBy?.email===myEmail);
+  const el=document.getElementById('responses-list');
+  if(!filtered.length){el.innerHTML=`<div style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📭</div>ยังไม่มีข้อมูล</div>`;return;}
+  el.innerHTML=filtered.map(s=>{
+    const dt=new Date(s.timestamp);
+    const dtStr=dt.toLocaleDateString('th-TH')+' '+dt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+    const pdate=s.patchDate?s.patchDate.split('-').reverse().join('/'):'?';
+    return`<div class="resp-card">
+      <div class="resp-card-header">
+        <div class="resp-card-info">
+          <div class="resp-date">📅 Patch Note: ${pdate}</div>
+          <div class="resp-meta">กรอกโดย: ${s.gpName} | ${s.company} | ส่งเมื่อ: ${dtStr}</div>
+          ${s.editHistory?.length?`<div style="font-size:11px;color:var(--yellow);margin-top:3px">✏️ แก้ไขแล้ว ${s.editHistory.length} ครั้ง</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="toggleResp('${s.id}')">👁 ดู</button>
+          <button class="btn btn-add btn-sm" onclick="openEdit('${s.id}')">✏️ Edit</button>
+          <button class="btn btn-astek btn-sm" onclick="exportAstek('${s.id}')">🖥 Export Astek</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteSubmission('${s.id}')">🗑 ลบ</button>
+        </div>
+      </div>
+      <div class="resp-body" id="resp_${s.id}">
+        ${(s.sections||[]).map(sec=>`<div class="resp-section-item"><div class="resp-section-title">${sec.icon} ${sec.label}</div>${(sec.instances||[]).map(inst=>Object.entries(inst).map(([k,v])=>{if(!v||v==='{}'||k.startsWith('_'))return'';let disp=typeof v==='object'?formatDateRange(v,true):String(v);if(disp.startsWith('data:'))disp='[รูปภาพ]';if(!disp.trim())return'';return`<div class="resp-field"><strong>${k}:</strong>${disp}</div>`;}).join('')).join('')}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleResp(id){document.getElementById('resp_'+id)?.classList.toggle('open');}
+
+// ═══════════════════════════════════════════
+//  MAKE FORUM SYSTEM
+// ═══════════════════════════════════════════
+function setForumImportStatus(msg, type='info'){
+  const el=document.getElementById('forum-import-status');
+  el.className='import-status import-'+type;
+  el.innerHTML=msg;
+  el.style.display='';
+}
+
+// Dynamic script loader with fallback URLs
+// Tries each URL in order; after onload checks that the script actually defined something
+function loadScript(urls){
+  const list=Array.isArray(urls)?urls:[urls];
+  function tryNext(i){
+    return new Promise((res,rej)=>{
+      if(i>=list.length){rej(new Error('ไม่สามารถโหลด library ได้ — ลอง Refresh หน้า หรือใช้ Paste แทน'));return;}
+      const src=list[i];
+      // If already successfully loaded (marked by us), skip
+      const existing=document.querySelector(`script[src="${src}"][data-ok="1"]`);
+      if(existing){res();return;}
+      // Remove any previous failed attempt for same URL
+      const failed=document.querySelector(`script[src="${src}"][data-ok="0"]`);
+      if(failed)failed.remove();
+      const s=document.createElement('script');
+      s.src=src;
+      s.onload=()=>{s.dataset.ok='1';res();};
+      s.onerror=()=>{s.dataset.ok='0';tryNext(i+1).then(res).catch(rej);};
+      document.head.appendChild(s);
+    });
+  }
+  return tryNext(0);
+}
+
+// --- PDF Import ---
+async function handleForumPDF(input){
+  const file=input.files[0];if(!file)return;
+  setForumImportStatus('⏳ กำลังโหลด PDF.js...','info');
+  try{
+    // Load PDF.js dynamically — try each CDN one by one and verify library loaded
+    if(typeof pdfjsLib==='undefined'){
+      const pdfjsCDNs=[
+        ['https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.min.js','https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js'],
+        ['https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js','https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js'],
+        ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'],
+        ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js']
+      ];
+      let workerSrc='';
+      for(const [mainUrl,wkrUrl] of pdfjsCDNs){
+        try{
+          await loadScript([mainUrl]);
+          if(typeof pdfjsLib!=='undefined'){workerSrc=wkrUrl;break;}
+        }catch(e){}
+      }
+      if(typeof pdfjsLib==='undefined')throw new Error('โหลด PDF.js ไม่สำเร็จจากทุก CDN');
+      pdfjsLib.GlobalWorkerOptions.workerSrc=workerSrc;
+    } else {
+      // Already loaded — ensure worker is set
+      if(!pdfjsLib.GlobalWorkerOptions.workerSrc){
+        const v=pdfjsLib.version||'2.16.105';
+        pdfjsLib.GlobalWorkerOptions.workerSrc=`https://unpkg.com/pdfjs-dist@${v}/build/pdf.worker.min.js`;
+      }
+    }
+    setForumImportStatus('⏳ กำลังอ่าน PDF...','info');
+    const arrayBuffer=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+    let fullText='';
+    for(let i=1;i<=pdf.numPages;i++){
+      const page=await pdf.getPage(i);
+      const content=await page.getTextContent();
+      // Join items; insert newline when y-position changes significantly
+      let lastY=null;let lineText='';
+      content.items.forEach(item=>{
+        const y=item.transform?item.transform[5]:0;
+        if(lastY!==null&&Math.abs(y-lastY)>5){fullText+=lineText.trim()+'\n';lineText='';}
+        lineText+=(item.str||'');
+        lastY=y;
+      });
+      if(lineText.trim())fullText+=lineText.trim()+'\n';
+      fullText+='\n';
+    }
+    fullText=fullText.replace(/\n{3,}/g,'\n\n').trim();
+    document.getElementById('forum-raw-content').value=fullText;
+    setForumImportStatus(`✅ อ่าน PDF สำเร็จ: ${pdf.numPages} หน้า, ${fullText.length} ตัวอักษร — กด "⚡ แบ่ง Sections" เพื่อแยกเนื้อหา`,'ok');
+    toast('✅',`อ่าน PDF สำเร็จ: ${pdf.numPages} หน้า`);
+  }catch(e){
+    setForumImportStatus('❌ อ่าน PDF ไม่สำเร็จ: '+e.message+'<br><small>💡 ลอง Copy เนื้อหาจาก PDF แล้ว Paste ในกล่องเนื้อหาดิบด้านล่างแทน</small>','err');
+    toast('❌','อ่าน PDF ไม่สำเร็จ',true);
+  }
+  input.value='';
+}
+
+// --- XLSX Import ---
+async function handleForumXLSX(input){
+  const file=input.files[0];if(!file)return;
+  setForumImportStatus('⏳ กำลังโหลด SheetJS...','info');
+  try{
+    // Load SheetJS dynamically — try each CDN and verify XLSX is defined after each
+    if(typeof XLSX==='undefined'){
+      const xlsxCDNs=[
+        'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
+        'https://unpkg.com/xlsx@0.20.3/dist/xlsx.full.min.js',
+        'https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js',
+        'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js',
+        'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+      ];
+      for(const url of xlsxCDNs){
+        try{await loadScript([url]);}catch(e){}
+        if(typeof XLSX!=='undefined')break;
+      }
+    }
+    if(typeof XLSX==='undefined')throw new Error('โหลด SheetJS ไม่สำเร็จจากทุก CDN — ลองใช้ปุ่ม Upload CSV แทน (File → Download → CSV)');
+    setForumImportStatus('⏳ กำลังอ่าน XLSX...','info');
+    const arrayBuffer=await file.arrayBuffer();
+    const workbook=XLSX.read(arrayBuffer,{type:'array'});
+    let allSections=[];
+    workbook.SheetNames.forEach(sheetName=>{
+      const sheet=workbook.Sheets[sheetName];
+      const data=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''});
+      if(!data.length)return;
+      const headers=data[0].map(h=>String(h||''));
+      const rows=data.slice(1).filter(r=>r.some(c=>String(c||'').trim()!==''));
+      let content='';
+      if(rows.length>0&&headers.some(h=>h)){
+        content=headers.join(' | ')+'\n'+rows.map(r=>r.map(c=>String(c||'')).join(' | ')).join('\n');
+      } else if(rows.length>0){
+        content=rows.map(r=>r.map(c=>String(c||'')).join(' | ')).join('\n');
+      }
+      if(content.trim()){
+        allSections.push({
+          id:'fs_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+          title:sheetName,
+          content:content.trim(),
+          imageUrl:'',
+          tableData:{headers,rows:rows.map(r=>r.map(c=>String(c||'')))},
+          isTable:true
+        });
+      }
+    });
+    if(allSections.length===0)throw new Error('ไม่พบข้อมูลในไฟล์');
+    forumSections=[...forumSections,...allSections];
+    renderForumSections();
+    setForumImportStatus(`✅ อ่าน XLSX สำเร็จ: ${workbook.SheetNames.length} Sheet → สร้าง ${allSections.length} Section แล้ว`,'ok');
+    toast('✅','อ่าน XLSX สำเร็จ');
+  }catch(e){
+    setForumImportStatus('❌ อ่าน XLSX ไม่สำเร็จ: '+e.message,'err');
+    toast('❌','อ่าน XLSX ไม่สำเร็จ',true);
+  }
+  input.value='';
+}
+
+// Simple CSV parser (handles quoted fields with commas/newlines)
+function parseCSV(text){
+  // Auto-detect delimiter: tab or comma
+  const sample=text.slice(0,2000);
+  const delim=(sample.split('\t').length>sample.split(',').length)?'\t':',';
+  const rows=[];let cur=[];let field='';let inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];const next=text[i+1];
+    if(inQ){
+      if(c==='"'&&next==='"'){field+='"';i++;}
+      else if(c==='"'){inQ=false;}
+      else{field+=c;}
+    } else {
+      if(c==='"'){inQ=true;}
+      else if(c===delim){cur.push(field.trim());field='';}
+      else if(c==='\r'&&next==='\n'){cur.push(field.trim());rows.push(cur);cur=[];field='';i++;}
+      else if(c==='\n'||c==='\r'){cur.push(field.trim());rows.push(cur);cur=[];field='';}
+      else{field+=c;}
+    }
+  }
+  if(field||cur.length){cur.push(field.trim());rows.push(cur);}
+  return rows.filter(r=>r.some(c=>c));
+}
+
+// --- CSV Import (no library needed) ---
+async function handleForumCSV(input){
+  const file=input.files[0];if(!file)return;
+  setForumImportStatus('⏳ กำลังอ่าน CSV...','info');
+  try{
+    const text=await file.text();
+    const rows=parseCSV(text);
+    if(!rows.length)throw new Error('ไฟล์ว่างเปล่า');
+    const headers=rows[0];
+    const dataRows=rows.slice(1).filter(r=>r.some(c=>c));
+    if(!dataRows.length)throw new Error('ไม่พบแถวข้อมูล (มีแค่ header)');
+    const content=headers.join(' | ')+'\n'+dataRows.map(r=>{
+      // Pad row to header length
+      while(r.length<headers.length)r.push('');
+      return r.join(' | ');
+    }).join('\n');
+    const sec={
+      id:'fs_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      title:file.name.replace(/\.(csv|tsv)$/i,''),
+      content:content.trim(),
+      imageUrl:'',
+      tableData:{headers,rows:dataRows.map(r=>{while(r.length<headers.length)r.push('');return r;})},
+      isTable:true
+    };
+    forumSections.push(sec);
+    renderForumSections();
+    setForumImportStatus(`✅ อ่าน CSV สำเร็จ: ${dataRows.length} แถว, ${headers.length} คอลัมน์ — สร้าง Section แล้ว`,'ok');
+    toast('✅','อ่าน CSV สำเร็จ');
+  }catch(e){
+    setForumImportStatus('❌ อ่าน CSV ไม่สำเร็จ: '+e.message,'err');
+    toast('❌','อ่าน CSV ไม่สำเร็จ',true);
+  }
+  input.value='';
+}
+
+// --- Apps Script Import (postMessage relay — ใช้ popup หลีกเลี่ยง CORS จาก file://) ---
+let _gppRelayHandler=null;
+
+function _openRelay(url, sheetName, onSuccess, onError){
+  // Remove previous listener
+  if(_gppRelayHandler){window.removeEventListener('message',_gppRelayHandler);_gppRelayHandler=null;}
+
+  let done=false;
+  const timer=setTimeout(()=>{
+    if(done)return;done=true;
+    window.removeEventListener('message',_gppRelayHandler);
+    onError(new Error('Timeout 20s — ตรวจสอบว่า Deploy ใหม่แล้ว และ URL ถูกต้อง'));
+  },20000);
+
+  _gppRelayHandler=(e)=>{
+    if(!e.data||!e.data.gppData)return;
+    if(done)return;done=true;
+    clearTimeout(timer);
+    window.removeEventListener('message',_gppRelayHandler);
+    onSuccess(e.data.gppData);
+  };
+  window.addEventListener('message',_gppRelayHandler);
+
+  const sep=url.includes('?')?'&':'?';
+  const relayUrl=url+sep+'relay=1'+(sheetName?'&sheet='+encodeURIComponent(sheetName):'')+'&_t='+Date.now();
+  const popup=window.open(relayUrl,'gpp_relay','width=320,height=120,top=200,left=300');
+  if(!popup){
+    clearTimeout(timer);
+    window.removeEventListener('message',_gppRelayHandler);
+    onError(new Error('Popup ถูกบล็อก — กรุณาอนุญาต Pop-up สำหรับหน้านี้ใน address bar แล้วลองอีกครั้ง'));
+  }
+}
+
+function fetchAppsScriptSheets(){
+  const url=(document.getElementById('apps-script-url').value||'').trim();
+  if(!url){toast('⚠️','กรุณาใส่ Apps Script URL',true);return;}
+  setForumImportStatus('⏳ กำลังเปิดหน้าต่าง Apps Script...','info');
+  localStorage.setItem('gpp_apps_script_url',url);
+
+  _openRelay(url,'',
+    (data)=>{
+      const sheets=data.allSheets||[data.sheetName||'Sheet1'];
+      const sel=document.getElementById('apps-script-sheet-select');
+      sel.innerHTML=sheets.map(s=>`<option value="${encodeURIComponent(s)}">${s}</option>`).join('');
+      document.getElementById('apps-script-sheet-row').style.display='';
+      setForumImportStatus(`✅ เชื่อมต่อสำเร็จ: พบ ${sheets.length} Sheet — เลือก Sheet แล้วกด "นำเข้าข้อมูล"`,'ok');
+      toast('✅',`พบ ${sheets.length} Sheet`);
+    },
+    (err)=>{
+      setForumImportStatus('❌ '+err.message,'err');
+      toast('❌','เชื่อมต่อไม่สำเร็จ',true);
+    }
+  );
+}
+
+function fetchAppsScriptData(){
+  const baseUrl=(document.getElementById('apps-script-url').value||'').trim();
+  const sheetEnc=document.getElementById('apps-script-sheet-select').value||'';
+  const sheetName=decodeURIComponent(sheetEnc);
+  if(!baseUrl){toast('⚠️','กรุณาใส่ Apps Script URL',true);return;}
+  setForumImportStatus(`⏳ กำลังโหลด Sheet "${sheetName}"...`,'info');
+
+  _openRelay(baseUrl, sheetName,
+    (data)=>{
+      const rows=data.rows||[];
+      if(!rows.length){setForumImportStatus('❌ ไม่มีข้อมูลใน Sheet นี้','err');return;}
+      const sections=_rowsToSections(rows,sheetName);
+      if(!sections.length){setForumImportStatus('❌ ไม่สามารถแยก Section ได้','err');return;}
+      forumSections=[...forumSections,...sections];
+      renderForumSections();
+      setForumImportStatus(`✅ โหลด "${sheetName}" สำเร็จ: ${rows.length} แถว → สร้าง ${sections.length} Section`,'ok');
+      toast('✅',`โหลด ${sheetName}: ${sections.length} Section`);
+    },
+    (err)=>{
+      setForumImportStatus('❌ '+err.message,'err');
+      toast('❌','โหลดไม่สำเร็จ',true);
+    }
+  );
+}
+
+// Convert raw rows array → forum sections
+function _rowsToSections(rows, sheetName){
+  const sections=[];
+  let curTitle='';let curLines=[];let curImages=[];let curTableRows=[];let isTblMode=false;
+
+  const flushSection=()=>{
+    if(!curLines.length&&!curImages.length&&!curTableRows.length)return;
+    const hasTable=curTableRows.length>1;
+    const content=hasTable
+      ?curTableRows.map(r=>r.map(c=>typeof c==='object'?'[img]':c).filter(c=>c).join(' | ')).join('\n')
+      :curLines.join('\n').trim();
+    sections.push({
+      id:'fs_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      title:curTitle||`${sheetName} #${sections.length+1}`,
+      content:content,
+      imageUrl:curImages[0]||'',
+      tableData:hasTable?{
+        headers:curTableRows[0].map(c=>typeof c==='object'?'[img]':String(c||'')),
+        rows:curTableRows.slice(1).map(r=>r.map(c=>typeof c==='object'?'[img]':String(c||'')))
+      }:null,
+      isTable:hasTable
+    });
+    curTitle='';curLines=[];curImages=[];curTableRows=[];isTblMode=false;
+  };
+
+  rows.forEach((row,ri)=>{
+    const nonEmpty=row.filter(c=>(typeof c==='object')||(typeof c==='string'&&c.trim()!==''));
+    if(!nonEmpty.length){if(curLines.length||curImages.length||curTableRows.length)flushSection();return;}
+    row.filter(c=>typeof c==='object'&&c.type==='image').forEach(img=>curImages.push(img.url));
+    const textCells=row.filter(c=>typeof c==='string'&&c.trim()!=='');
+    if(nonEmpty.length>=3){isTblMode=true;curTableRows.push(row);return;}
+    if(isTblMode){flushSection();}
+    const joined=textCells.join(' ').trim();
+    if(!curTitle&&joined&&joined.length<120){curTitle=joined;}
+    else if(joined){curLines.push(joined);}
+  });
+  flushSection();
+  return sections;
+}
+
+// Auto-restore saved Apps Script URL
+document.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem('gpp_apps_script_url');
+  if(saved){const el=document.getElementById('apps-script-url');if(el)el.value=saved;}
+});
+
+// --- Google Sheet Import ---
+async function fetchGSheet(){
+  const url=(document.getElementById('gsheet-url').value||'').trim();
+  if(!url){toast('⚠️','กรุณาใส่ URL',true);return;}
+  const match=url.match(/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if(!match){setForumImportStatus('❌ URL ไม่ใช่ Google Sheet — ต้องมี /spreadsheets/d/{id}','err');return;}
+  const id=match[1];
+  setForumImportStatus('⏳ กำลังโหลด Google Sheet...','info');
+  // Try multiple URL formats; gviz/tq has better CORS support than export
+  const attempts=[
+    {url:`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`,label:'gviz'},
+    {url:`https://docs.google.com/spreadsheets/d/${id}/export?format=csv`,label:'export'}
+  ];
+  let lastErr='';
+  for(const {url:csvUrl,label} of attempts){
+    try{
+      const resp=await fetch(csvUrl,{credentials:'omit'});
+      if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+      const text=await resp.text();
+      // Detect if we got a login page instead of CSV
+      if(text.includes('<html')&&text.includes('accounts.google'))
+        throw new Error('ต้อง Share เป็น "Anyone with link can view" ก่อน');
+      const rows=parseCSV(text);
+      if(!rows.length)throw new Error('ไม่มีข้อมูล');
+      const headers=rows[0];
+      const dataRows=rows.slice(1).filter(r=>r.some(c=>c));
+      const content=headers.join(' | ')+'\n'+dataRows.map(r=>r.join(' | ')).join('\n');
+      const sec={id:'fs_'+Date.now(),title:'Google Sheet',content:content.trim(),imageUrl:'',
+        tableData:{headers,rows:dataRows},isTable:true};
+      forumSections.push(sec);
+      renderForumSections();
+      setForumImportStatus(`✅ โหลด Google Sheet สำเร็จ (${label}): ${dataRows.length} แถว — เพิ่ม Section แล้ว`,'ok');
+      toast('✅','โหลด Google Sheet สำเร็จ');
+      return;
+    }catch(e){lastErr=e.message;}
+  }
+  // Both failed — CORS fallback: open sheet in new tab and instruct to download CSV
+  setForumImportStatus(`❌ โหลด Google Sheet ไม่สำเร็จ: ${lastErr}<br>
+<small>💡 <strong>วิธีแก้:</strong> เปิด Google Sheet → File → Download → Comma Separated Values (.csv) → Upload ไฟล์ผ่านปุ่ม "Upload CSV" แทน</small>`,'err');
+  toast('❌','โหลด Google Sheet ไม่สำเร็จ — ดูวิธีแก้ในกล่องข้อความ',true);
+}
+
+// --- Google Doc Import ---
+async function fetchGDoc(){
+  const url=(document.getElementById('gdoc-url').value||'').trim();
+  if(!url){toast('⚠️','กรุณาใส่ URL',true);return;}
+  const match=url.match(/document\/d\/([a-zA-Z0-9_-]+)/);
+  if(!match){toast('⚠️','URL ไม่ถูกต้อง',true);return;}
+  const id=match[1];
+  const txtUrl=`https://docs.google.com/document/d/${id}/export?format=txt`;
+  setForumImportStatus('⏳ กำลังโหลด Google Doc...','info');
+  try{
+    const resp=await fetch(txtUrl);
+    if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+    const text=(await resp.text()).trim();
+    if(!text)throw new Error('ไฟล์ว่างเปล่า');
+    document.getElementById('forum-raw-content').value=text;
+    setForumImportStatus(`✅ โหลด Google Doc สำเร็จ: ${text.length} ตัวอักษร — กด "แบ่ง Sections" เพื่อแยกเนื้อหา`,'ok');
+    toast('✅','โหลด Google Doc สำเร็จ');
+  }catch(e){
+    setForumImportStatus(`❌ โหลด Google Doc ไม่สำเร็จ: ${e.message}<br><small>ตรวจสอบว่า Share เป็น "Anyone with link can view"</small>`,'err');
+    toast('❌','โหลดไม่สำเร็จ',true);
+  }
+}
+
+// --- Parse raw text into sections ---
+function parseRawContent(){
+  const text=(document.getElementById('forum-raw-content').value||'').trim();
+  if(!text){toast('⚠️','ยังไม่มีเนื้อหา',true);return;}
+  // Split by double newlines or lines that look like section headers
+  const blocks=text.split(/\n{2,}/);
+  const newSections=blocks.filter(b=>b.trim()).map((block,i)=>{
+    const lines=block.trim().split('\n');
+    let title='Section '+(forumSections.length+i+1);
+    let content=block.trim();
+    // First line as title if: short (<60 chars), and rest of block has content
+    if(lines.length>1&&lines[0].length<60&&lines[0].length>2){
+      // Extra heuristic: first line has no Thai punctuation mid-sentence
+      const firstLine=lines[0].trim();
+      if(!/[,;]$/.test(firstLine)){
+        title=firstLine;
+        content=lines.slice(1).join('\n').trim();
+      }
+    } else if(lines.length===1&&lines[0].length<60){
+      title=lines[0].trim();
+      content='';
+    }
+    return{id:'fs_'+Date.now()+'_'+i+'_'+Math.random().toString(36).slice(2,5),title,content,imageUrl:'',tableData:null,isTable:false};
+  });
+  forumSections=[...forumSections,...newSections];
+  renderForumSections();
+  toast('✅',`แบ่งเนื้อหาเป็น ${newSections.length} Section แล้ว`);
+}
+
+// --- Render forum section editor cards ---
+function renderForumSections(){
+  const container=document.getElementById('forum-sections-list');
+  if(forumSections.length===0){
+    container.innerHTML=`<div style="text-align:center;padding:32px;color:var(--text3);background:var(--card);border:1px dashed var(--border);border-radius:12px;margin-bottom:14px">
+      <div style="font-size:28px;margin-bottom:8px">📝</div>
+      ยังไม่มี Section — นำเข้าข้อมูลหรือกด "＋ เพิ่ม Section"
+    </div>`;
+    return;
+  }
+  container.innerHTML=forumSections.map((sec,idx)=>buildForumSectionCard(sec,idx)).join('');
+}
+
+function buildForumSectionCard(sec,idx){
+  const tablePreview=sec.isTable&&sec.tableData?buildTablePreviewHTML(sec.tableData):'';
+  return`<div class="forum-sec-card" id="fsec_${sec.id}">
+    <div class="forum-sec-hdr">
+      <span style="color:var(--text3);font-size:13px;font-weight:600;white-space:nowrap;padding-right:8px">#${idx+1}</span>
+      <input placeholder="หัวข้อ Section" value="${esc(sec.title)}" id="ftitle_${sec.id}" oninput="updateForumSection('${sec.id}','title',this.value)">
+      <button class="btn btn-danger btn-sm" onclick="removeForumSection('${sec.id}')">✕</button>
+    </div>
+    <div class="forum-sec-body">
+      ${tablePreview?`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase">📊 ข้อมูลจากตาราง (แสดงเป็น Table ใน Forum)</div>${tablePreview}</div>`:''}
+      <div class="form-group" style="margin-bottom:10px">
+        <label class="f-label" style="margin-bottom:6px">เนื้อหา <span class="opt">(แก้ไขได้)</span></label>
+        <textarea class="f-textarea" rows="4" id="fcontent_${sec.id}" placeholder="เนื้อหาของ Section นี้..." oninput="updateForumSection('${sec.id}','content',this.value)">${esc(sec.content)}</textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="f-label" style="margin-bottom:6px">Image URL <span class="opt">(Optional)</span></label>
+        <input type="url" class="f-input" id="fimg_${sec.id}" value="${esc(sec.imageUrl||'')}" placeholder="https://..." oninput="updateForumSection('${sec.id}','imageUrl',this.value)">
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildTablePreviewHTML(tableData){
+  if(!tableData||!tableData.headers||!tableData.rows)return'';
+  const maxCols=6;const maxRows=5;
+  const headers=tableData.headers.slice(0,maxCols);
+  const rows=tableData.rows.slice(0,maxRows);
+  const moreCols=tableData.headers.length>maxCols;const moreRows=tableData.rows.length>maxRows;
+  let html=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr>${headers.map(h=>`<th style="padding:5px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text3);text-align:left">${esc(String(h||''))}</th>`).join('')}${moreCols?'<th style="...">...</th>':''}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${r.slice(0,maxCols).map(c=>`<td style="padding:5px 8px;border:1px solid rgba(30,53,86,.3);color:var(--text2)">${esc(String(c||''))}</td>`).join('')}${moreCols?'<td>...</td>':''}</tr>`).join('')}${moreRows?`<tr><td colspan="${headers.length+(moreCols?1:0)}" style="padding:6px;text-align:center;color:var(--text3)">... ${tableData.rows.length-maxRows} แถวเพิ่มเติม</td></tr>`:''}
+    </tbody>
+  </table></div>`;
+  return html;
+}
+
+function updateForumSection(id,field,value){
+  const sec=forumSections.find(s=>s.id===id);if(sec)sec[field]=value;
+}
+function addForumSection(title='',content=''){
+  const sec={id:'fs_'+Date.now(),title:title||'Section '+(forumSections.length+1),content,imageUrl:'',tableData:null,isTable:false};
+  forumSections.push(sec);
+  renderForumSections();
+  // scroll to new card
+  setTimeout(()=>document.getElementById('fsec_'+sec.id)?.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+function removeForumSection(id){
+  forumSections=forumSections.filter(s=>s.id!==id);
+  renderForumSections();
+}
+function clearForum(){
+  if(!confirm('ล้างข้อมูล Make Forum ทั้งหมด?'))return;
+  forumSections=[];forumGeneratedHTML='';editingForumId=null;
+  document.getElementById('forum-title').value='';
+  document.getElementById('forum-author').value=currentUser?.name?.split(' ')[0]||'';
+  document.getElementById('forum-company').value='';
+  document.querySelectorAll('#forum-company-group .company-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('forum-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('forum-raw-content').value='';
+  document.getElementById('forum-import-status').style.display='none';
+  renderForumSections();
+  document.getElementById('forum-preview-card').style.display='none';
+  toast('🔄','ล้างข้อมูลแล้ว');
+}
+
+// ═══════════════════════════════════════════
+//  GENERATE FORUM HTML (Astek-style TOSM)
+// ═══════════════════════════════════════════
+function generateForumHTML(){
+  // Sync section edits from DOM before generating
+  forumSections.forEach(sec=>{
+    const tEl=document.getElementById('ftitle_'+sec.id);if(tEl)sec.title=tEl.value;
+    const cEl=document.getElementById('fcontent_'+sec.id);if(cEl)sec.content=cEl.value;
+    const iEl=document.getElementById('fimg_'+sec.id);if(iEl)sec.imageUrl=iEl.value;
+  });
+
+  const title=document.getElementById('forum-title').value.trim();
+  const author=document.getElementById('forum-author').value.trim();
+  const company=document.getElementById('forum-company').value;
+  const date=document.getElementById('forum-date').value;
+
+  if(!title){toast('⚠️','กรุณาใส่หัวข้อ Forum',true);return;}
+  if(!author){toast('⚠️','กรุณาใส่ชื่อผู้โพสต์',true);return;}
+  if(!date){toast('⚠️','กรุณาเลือกวันที่',true);return;}
+  if(forumSections.length===0){toast('⚠️','กรุณาเพิ่มเนื้อหาอย่างน้อย 1 Section',true);return;}
+
+  const pdate=date.split('-').reverse().join('/');
+  const dtStr=new Date(date).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
+  const gpName='GP: '+author;
+
+  // ── Hero ──
+  const hero=`<div style="background:#1E3A28;border-radius:14px;padding:28px 26px 22px;margin-bottom:10px;border:1px solid #2D5E3E">
+<div style="margin-bottom:12px"><span style="background:#C9973A;color:#2A1400;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:.8px">FORUM POST</span><span style="font-size:11px;color:#A8D4B4;margin-left:8px">GP:PURPLE</span></div>
+<h1 style="font-size:20px;font-weight:700;color:#F2ECC8;margin:0 0 6px;line-height:1.35;font-family:'Segoe UI','Noto Sans Thai',sans-serif">${esc(title)}</h1>
+<p style="font-size:13px;color:#C4E0CB;margin:0 0 16px">Tales of Souls Master &middot; เซิร์ฟเวอร์ไทย &middot; โดย ${esc(gpName)}${company?' ('+esc(company)+')':''}</p>
+<div style="display:flex;flex-wrap:wrap;gap:18px;padding-top:12px;border-top:1px solid rgba(201,151,58,.22)">
+<span style="font-size:13px;color:#A8D4B4">&bull; วันที่ <strong style="color:#F2ECC8">${dtStr}</strong></span>
+<span style="font-size:13px;color:#A8D4B4">&bull; หัวข้อ <strong style="color:#F2ECC8">${forumSections.map(s=>esc(s.title)).join(', ')}</strong></span>
+</div></div>`;
+
+  // ── TOC ──
+  const tocLinks=forumSections.map((sec,i)=>`<a href="#fp${i}" style="font-size:14px;color:#2D5E3E;padding:5px 10px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;border-radius:6px;border:1px solid rgba(45,94,62,.2)">&#128203; ${esc(sec.title)}</a>`).join('');
+  const toc=`<div style="background:#F5F0E4;border:1px solid #C9B882;border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center">
+<h3 style="font-size:14px;font-weight:700;color:#6B4E1A;margin:0 0 12px;font-family:'Segoe UI','Noto Sans Thai',sans-serif">&#128203; สารบัญ</h3>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px">${tocLinks}</div></div>`;
+
+  // ── Sections ──
+  const sectionsHtml=forumSections.map((sec,i)=>buildForumSection(sec,i)).join('');
+
+  // ── Footer ──
+  const footer=`<div style="text-align:center;padding:18px 12px;border-top:2px solid #C9B882;margin-top:10px;background:#F5F0E4;border-radius:0 0 12px 12px;font-size:13px;color:#3A2800;line-height:2.2;font-family:'Segoe UI','Noto Sans Thai',sans-serif">
+&#128240; ไม่พลาดทุกข่าวสาร เชื่อมต่อกับผู้กอบกู้ท่านอื่นๆได้ที่ &#128044;<br>
+&#9642; Website: <a href="http://exe.in.th/tosm_main" style="color:#2D5E3E;font-weight:700">คลิก</a> &nbsp;|&nbsp;
+&#9642; Facebook Official Page: <a href="http://exe.in.th/tosm_like_fanpage" style="color:#2D5E3E;font-weight:700">คลิก</a> &nbsp;|&nbsp;
+&#9642; Facebook Group: <a href="http://exe.in.th/tosm_join_group" style="color:#2D5E3E;font-weight:700">คลิก</a><br>
+&#9642; Discord Official: <a href="https://exe.in.th/TOSM_Discord" style="color:#2D5E3E;font-weight:700">เข้าร่วม</a> &nbsp;|&nbsp;
+&#9642; LINE OA Official: <a href="http://exe.in.th/tosm_line" style="color:#2D5E3E;font-weight:700">คลิก</a>
+</div>`;
+
+  forumGeneratedHTML=`<div style="max-width:700px;margin:0 auto;font-family:'Segoe UI','Noto Sans Thai',sans-serif;color:#1E2B1A">${hero}${toc}${sectionsHtml}${footer}</div>`;
+
+  // Show preview
+  document.getElementById('forum-preview-area').innerHTML=forumGeneratedHTML;
+  document.getElementById('forum-html-output').value=forumGeneratedHTML;
+  document.getElementById('forum-preview-card').style.display='';
+  document.getElementById('forum-preview-card').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('✅','สร้าง Forum HTML สำเร็จ! กด Copy HTML หรือบันทึก');
+}
+
+function buildForumSection(sec,idx){
+  const anchor=`<div id="fp${idx}" style="display:block;height:0;padding-top:48px;margin-top:-48px"></div>`;
+  const header=`<div style="text-align:center;margin-bottom:16px">
+<h3 style="display:inline-block;background:#000000;color:#F1C40F;font-size:18px;font-weight:700;padding:10px 32px;border-radius:10px;margin:0;font-family:'Segoe UI','Noto Sans Thai',sans-serif">${esc(sec.title)}</h3>
+</div>`;
+
+  let body='';
+
+  // If this section has table data, render as table
+  if(sec.isTable&&sec.tableData&&sec.tableData.headers&&sec.tableData.rows.length>0){
+    body+=buildForumTable(sec.tableData);
+  }
+
+  // Render text content if any
+  if(sec.content&&sec.content.trim()){
+    body+=`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:14px 16px;margin-bottom:10px">
+<p style="font-size:14px;color:#1E2B1A;line-height:1.75;white-space:pre-wrap;margin:0;font-family:'Segoe UI','Noto Sans Thai',sans-serif">${esc(sec.content)}</p>
+</div>`;
+  }
+
+  // Image
+  if(sec.imageUrl&&sec.imageUrl.trim()){
+    body+=`<div style="text-align:center;margin-bottom:10px">
+<img src="${esc(sec.imageUrl)}" style="max-width:100%;border-radius:10px;border:1px solid #DDD5B4" alt="${esc(sec.title)}">
+</div>`;
+  }
+
+  if(!body)body=`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:14px 16px;margin-bottom:10px;color:#7A6940;font-style:italic;font-size:13px">(ไม่มีเนื้อหา)</div>`;
+  return`<div style="margin-bottom:28px">${anchor}${header}${body}</div>`;
+}
+
+function buildForumTable(tableData){
+  const headers=tableData.headers.filter(h=>String(h||'').trim());
+  const rows=tableData.rows.filter(r=>r.some(c=>String(c||'').trim()));
+  if(!headers.length&&!rows.length)return'';
+  const ths=headers.map(h=>`<th style="background:#2D5E3E;color:#F2ECC8;font-size:13px;font-weight:700;padding:9px 10px;text-align:left;border-bottom:1px solid #3A7050">${esc(String(h||''))}</th>`).join('');
+  const trs=rows.map((row,i)=>{
+    const odd=i%2===0;
+    const bg=odd?'#F5F0E4':'#FFFFFF';const tc=odd?'#1E2010':'#2E2E2E';const bc=odd?'#E0D8C0':'#EBEBEB';
+    const tds=row.map(c=>`<td style="padding:8px 10px;border-bottom:1px solid ${bc};color:${tc};vertical-align:middle;background:${bg};font-size:13px;word-break:break-word">${esc(String(c||''))}</td>`).join('');
+    return`<tr>${tds}</tr>`;
+  }).join('');
+  return`<div style="border-radius:10px;overflow:hidden;border:1.5px solid #2D5E3E;margin-bottom:10px"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`;
+}
+
+function copyForumHTML(){
+  if(!forumGeneratedHTML){toast('⚠️','กรุณา Generate ก่อน',true);return;}
+  navigator.clipboard.writeText(forumGeneratedHTML)
+    .then(()=>toast('✅','คัดลอก HTML แล้ว! เปิด Astek → Tools → Source code → วาง → Save'))
+    .catch(()=>{
+      const ta=document.getElementById('forum-html-output');
+      ta.select();document.execCommand('copy');
+      toast('✅','คัดลอก HTML แล้ว');
+    });
+}
+
+function saveForumToResponses(){
+  if(!forumGeneratedHTML){toast('⚠️','กรุณา Generate ก่อน',true);return;}
+  // Sync DOM values
+  forumSections.forEach(sec=>{
+    const tEl=document.getElementById('ftitle_'+sec.id);if(tEl)sec.title=tEl.value;
+    const cEl=document.getElementById('fcontent_'+sec.id);if(cEl)sec.content=cEl.value;
+    const iEl=document.getElementById('fimg_'+sec.id);if(iEl)sec.imageUrl=iEl.value;
+  });
+  const title=document.getElementById('forum-title').value.trim();
+  const author=document.getElementById('forum-author').value.trim();
+  const company=document.getElementById('forum-company').value;
+  const date=document.getElementById('forum-date').value;
+
+  const sub={
+    id:'forum_'+Date.now(),
+    type:'forum',
+    title,
+    gpName:'GP: '+author,
+    company,
+    date,
+    sections:JSON.parse(JSON.stringify(forumSections.map(s=>({...s,tableData:s.isTable?s.tableData:null})))),
+    html:forumGeneratedHTML,
+    submittedBy:{email:currentUser.email,name:currentUser.name},
+    timestamp:now(),
+    editHistory:[]
+  };
+
+  const existing=editingForumId;
+  let allSubs=getForumSubs();
+  if(existing){
+    allSubs=allSubs.map(s=>s.id===existing?{...sub,id:existing,editHistory:[...s.editHistory||[],{editedBy:{email:currentUser.email,name:currentUser.name},editedAt:now(),changes:'แก้ไขโพสต์'}]}:s);
+    toast('✅','อัปเดต Forum โพสต์แล้ว');
+  } else {
+    allSubs.unshift(sub);
+    toast('✅','บันทึก Forum โพสต์ใน My Responses แล้ว');
+  }
+  ls(SK.FORUM,JSON.stringify(allSubs));
+
+  // Add to history
+  const hist=getHist();
+  hist.unshift({action:'submit',subId:sub.id,patchDate:date,editedBy:{email:currentUser.email,name:currentUser.name},editedAt:now(),changes:(existing?'แก้ไข':'ส่ง')+'Forum: '+title,forumType:true});
+  ls(SK.HIST,JSON.stringify(hist));
+  editingForumId=null;
+}
+
+// ── Render Forum Responses ──
+function renderForumResponses(){
+  const subs=getForumSubs();
+  const viewAll=hasPerm(currentUser?.email,'view_all');
+  const myEmail=currentUser?.email;
+  const filtered=viewAll?subs:subs.filter(s=>s.submittedBy?.email===myEmail);
+  const el=document.getElementById('forum-responses-list');
+  if(!filtered.length){el.innerHTML=`<div style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">🗣</div>ยังไม่มี Forum Posts</div>`;return;}
+  el.innerHTML=filtered.map(s=>{
+    const dt=new Date(s.timestamp);
+    const dtStr=dt.toLocaleDateString('th-TH')+' '+dt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+    const pdate=s.date?s.date.split('-').reverse().join('/'):'?';
+    return`<div class="resp-card">
+      <div class="resp-card-header">
+        <div class="resp-card-info">
+          <div class="resp-date">🗣 ${esc(s.title||'ไม่มีหัวข้อ')}</div>
+          <div class="resp-meta">${s.gpName} | ${s.company} | ${pdate} | บันทึกเมื่อ: ${dtStr}</div>
+          ${s.editHistory?.length?`<div style="font-size:11px;color:var(--yellow);margin-top:3px">✏️ แก้ไขแล้ว ${s.editHistory.length} ครั้ง</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-astek btn-sm" onclick="copyForumSubHTML('${s.id}')">📋 Copy HTML</button>
+          <button class="btn btn-add btn-sm" onclick="editForumSub('${s.id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteForumSub('${s.id}')">🗑 ลบ</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyForumSubHTML(id){
+  const sub=getForumSubs().find(s=>s.id===id);if(!sub)return;
+  navigator.clipboard.writeText(sub.html||'')
+    .then(()=>toast('✅','คัดลอก HTML แล้ว! วางใน Astek Source code'))
+    .catch(()=>toast('⚠️','ไม่สามารถคัดลอกได้',true));
+}
+function editForumSub(id){
+  const sub=getForumSubs().find(s=>s.id===id);if(!sub)return;
+  editingForumId=id;
+  document.getElementById('forum-title').value=sub.title||'';
+  document.getElementById('forum-author').value=(sub.gpName||'').replace('GP: ','');
+  document.getElementById('forum-company').value=sub.company||'';
+  document.querySelectorAll('#forum-company-group .company-btn').forEach(b=>{b.classList.toggle('selected',b.textContent.includes(sub.company||''));});
+  document.getElementById('forum-date').value=sub.date||'';
+  forumSections=JSON.parse(JSON.stringify(sub.sections||[]));
+  renderForumSections();
+  forumGeneratedHTML=sub.html||'';
+  if(forumGeneratedHTML){
+    document.getElementById('forum-preview-area').innerHTML=forumGeneratedHTML;
+    document.getElementById('forum-html-output').value=forumGeneratedHTML;
+    document.getElementById('forum-preview-card').style.display='';
+  }
+  switchTab('makeforum',document.querySelectorAll('.tab-btn')[1]);
+  toast('✏️','โหลด Forum โพสต์เพื่อแก้ไขแล้ว');
+}
+function deleteForumSub(id){
+  if(!confirm('ลบ Forum โพสต์นี้?'))return;
+  const sub=getForumSubs().find(s=>s.id===id);
+  ls(SK.FORUM,JSON.stringify(getForumSubs().filter(s=>s.id!==id)));
+  const hist=getHist();
+  hist.unshift({action:'delete',subId:id,patchDate:sub?.date,editedBy:{email:currentUser.email,name:currentUser.name},editedAt:now(),changes:'ลบ Forum: '+sub?.title,forumType:true});
+  ls(SK.HIST,JSON.stringify(hist));
+  renderForumResponses();
+  toast('🗑','ลบแล้ว');
+}
+
+// ═══════════════════════════════════════════
+//  EDIT HISTORY
+// ═══════════════════════════════════════════
+function renderHistory(){
+  const hist=getHist();
+  renderHistList('hist-all-list',hist,true);
+  renderHistList('hist-submit-list',hist.filter(h=>h.action==='submit'));
+  renderHistList('hist-edit-list',hist.filter(h=>h.action==='edit'));
+  renderHistList('hist-delete-list',hist.filter(h=>h.action==='delete'));
+}
+function renderHistList(elId,hist,colored=false){
+  const el=document.getElementById(elId);if(!el)return;
+  if(!hist.length){el.innerHTML=`<div style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📜</div>ยังไม่มีข้อมูล</div>`;return;}
+  el.innerHTML=hist.map(h=>{
+    let icon='✏️',verb='แก้ไข',colorClass='';
+    if(h.action==='submit'){icon=h.forumType?'🗣':'📝';verb=h.forumType?'ส่ง Forum':'ส่งข้อมูลใหม่';if(colored)colorClass='h-submit';}
+    else if(h.action==='delete'){icon='🗑';verb='ลบข้อมูล';if(colored)colorClass='h-delete';}
+    else{icon='✏️';verb='แก้ไข';if(colored)colorClass='h-edit';}
+    const dt=new Date(h.editedAt||h.timestamp);
+    const dtStr=dt.toLocaleDateString('th-TH')+' เวลา: '+dt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})+' น.';
+    const who=h.editedBy?.name||h.editedBy?.email||'?';
+    const pd=h.patchDate?h.patchDate.split('-').reverse().join('/'):'?';
+    return`<div class="hist-item ${colorClass}">
+      <div class="hist-who">${icon} ${who} — ${verb}${h.forumType?'':(' Patch Note: '+pd)}</div>
+      <div class="hist-when">วันที่: ${dtStr}</div>
+      ${h.changes?`<div class="hist-detail">รายละเอียด: ${h.changes}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  PERMISSIONS ADMIN
+// ═══════════════════════════════════════════
+function addUser(){
+  const email=document.getElementById('new-email').value.trim().toLowerCase();
+  const role=document.getElementById('new-role').value;
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('⚠️','Email ไม่ถูกต้อง',true);return;}
+  const arr=getUsers();
+  const existing=arr.findIndex(u=>u.email===email);
+  if(existing>=0){arr[existing].role=role;toast('✅','อัปเดต Role สำเร็จ');}
+  else{arr.push({email,role,name:'',addedAt:now()});toast('✅','เพิ่ม '+email+' สำเร็จ');}
+  ls(SK.USERS,JSON.stringify(arr));
+  document.getElementById('new-email').value='';
+  renderPerms();
+}
+function removeUser(email){
+  if(email===ADMIN_EMAIL.toLowerCase()){toast('⚠️','ไม่สามารถลบ Admin ได้',true);return;}
+  if(!confirm('ต้องการลบ '+email+' ?'))return;
+  ls(SK.USERS,JSON.stringify(getUsers().filter(u=>u.email!==email)));
+  renderPerms();toast('🗑','ลบ '+email+' แล้ว');
+}
+function changeRole(email,role){
+  const arr=getUsers().map(u=>u.email===email?{...u,role}:u);
+  ls(SK.USERS,JSON.stringify(arr));renderPerms();toast('✅','เปลี่ยน Role สำเร็จ');
+}
+function revokeUserSession(email){
+  if(email===ADMIN_EMAIL.toLowerCase()){toast('⚠️','ไม่สามารถล้าง Session ของ Admin ได้',true);return;}
+  const arr=getUsers().map(u=>u.email===email?{...u,sessionRevoked:true,revokedAt:now()}:u);
+  ls(SK.USERS,JSON.stringify(arr));
+  renderPerms();toast('🔒','ล้าง Login ของ '+email+' แล้ว');
+}
+function renderPerms(){
+  const arr=getUsers();
+  document.getElementById('email-count').textContent=arr.length;
+  const el=document.getElementById('email-list');
+  el.innerHTML=arr.map(u=>{
+    const r=ROLES[u.role]||ROLES.editor;
+    const isOwner=u.email===ADMIN_EMAIL.toLowerCase();
+    const revoked=u.sessionRevoked===true;
+    const lastLoginStr=u.lastLogin?new Date(u.lastLogin).toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'ยังไม่เคย Login';
+    return`<div class="email-item" style="flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="dot" style="background:${r.color};flex-shrink:0"></div>
+        <span style="font-size:13px;flex:1;min-width:0;word-break:break-all">${u.email}</span>
+        ${revoked?`<span style="font-size:10px;font-weight:700;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);padding:2px 8px;border-radius:20px;white-space:nowrap">🔒 รอ Login ใหม่</span>`:''}
+        ${isOwner?`<span class="badge badge-admin">⚡ Owner</span>`:`
+          <select onchange="changeRole('${u.email}',this.value)" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:3px 8px;cursor:pointer">
+            ${Object.entries(ROLES).map(([k,v])=>`<option value="${k}"${u.role===k?' selected':''}>${v.label}</option>`).join('')}
+          </select>`}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+        <span style="font-size:11px;color:var(--text3)">🕐 Last Login: ${lastLoginStr}</span>
+        <div style="display:flex;gap:6px">
+          ${isOwner?'':`<button class="btn btn-sm" onclick="generateInviteLink('${u.email}','${u.role}')" style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);color:var(--purple2);font-size:11px">🔗 Invite</button>`}
+          ${isOwner?'':`<button class="btn btn-sm" onclick="revokeUserSession('${u.email}')" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--yellow);font-size:11px">🔒 ล้าง Login</button>`}
+          ${isOwner?'':`<button class="btn btn-danger btn-sm" onclick="removeUser('${u.email}')" style="font-size:11px">ลบ</button>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  LOGS
+// ═══════════════════════════════════════════
+function renderLogs(){
+  const logs=getLogs();
+  document.getElementById('s-total').textContent=logs.length;
+  document.getElementById('s-ok').textContent=logs.filter(l=>l.status==='success').length;
+  document.getElementById('s-no').textContent=logs.filter(l=>l.status==='denied').length;
+  const tbody=document.getElementById('log-body');
+  if(!logs.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3)">ยังไม่มีข้อมูล</td></tr>';return;}
+  tbody.innerHTML=logs.map((l,i)=>{
+    const dt=new Date(l.timestamp);
+    const dts=dt.toLocaleDateString('th-TH')+' '+dt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+    return`<tr><td style="color:var(--text3)">${i+1}</td><td>${l.name}${l.demo?' <span style="color:var(--yellow);font-size:10px">[Demo]</span>':''}</td><td style="font-family:Consolas,font-size:12px">${l.email}</td><td style="font-size:12px">${dts}</td><td><span class="sbadge ${l.status==='success'?'s-ok':'s-no'}">${l.status==='success'?'✅ สำเร็จ':'🚫 ปฏิเสธ'}</span></td></tr>`;
+  }).join('');
+}
+function confirmClearLogs(){showModal('modal-confirm-clear-logs');}
+function doClearLogs(){closeModal('modal-confirm-clear-logs');ls(SK.LOGS,JSON.stringify([]));renderLogs();toast('🗑','ล้าง Log แล้ว');}
+function exportLogs(){
+  const logs=getLogs();if(!logs.length){toast('⚠️','ไม่มีข้อมูล',true);return;}
+  const csv='No,Name,Email,Timestamp,Status\n'+logs.map((l,i)=>`${i+1},"${l.name}","${l.email}","${l.timestamp}","${l.status}"`).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='login-log-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  toast('✅','Export สำเร็จ');
+}
+
+// ═══════════════════════════════════════════
+//  ASTEK EXPORT (Patch Note)
+// ═══════════════════════════════════════════
+function exportAstek(subId){
+  const sub=getSubs().find(s=>s.id===subId);if(!sub)return;
+  const html=buildAstekHTML(sub);
+  navigator.clipboard.writeText(html)
+    .then(()=>toast('✅','คัดลอก HTML แล้ว! เปิด Astek → Tools → Source code → วาง → Save'))
+    .catch(()=>toast('⚠️','ไม่สามารถคัดลอกได้',true));
+}
+function buildAstekHTML(sub){
+  const pdate=sub.patchDate?sub.patchDate.split('-').reverse().join('/'):'?';
+  const dtStr=new Date(sub.timestamp).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
+  const sections=sub.sections||[];
+  const hero=`<div style="background:#1E3A28;border-radius:14px;padding:28px 26px 22px;margin-bottom:10px;border:1px solid #2D5E3E">
+<div style="margin-bottom:12px"><span style="background:#C9973A;color:#2A1400;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:.8px">PATCH NOTE</span><span style="font-size:11px;color:#A8D4B4;margin-left:8px">GP:PURPLE</span></div>
+<h1 style="font-size:20px;font-weight:700;color:#F2ECC8;margin:0 0 6px;line-height:1.35;font-family:'Segoe UI','Noto Sans Thai',sans-serif">Patch Note: ${pdate}</h1>
+<p style="font-size:13px;color:#C4E0CB;margin:0 0 16px">Tales of Souls Master &middot; เซิร์ฟเวอร์ไทย &middot; รวบรวมโดย ${esc(sub.gpName)}</p>
+<div style="display:flex;flex-wrap:wrap;gap:18px;padding-top:12px;border-top:1px solid rgba(201,151,58,.22)">
+<span style="font-size:13px;color:#A8D4B4">&bull; วันที่อัปเดต <strong style="color:#F2ECC8">${dtStr}</strong></span>
+<span style="font-size:13px;color:#A8D4B4">&bull; หมวดหมู่ <strong style="color:#F2ECC8">${sections.map(s=>esc(s.label)).join(', ')}</strong></span>
+</div></div>`;
+  const tocLinks=sections.map((sec,i)=>`<a href="#ts${i}" style="font-size:14px;color:#2D5E3E;padding:5px 10px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;border-radius:6px;border:1px solid rgba(45,94,62,.2)">${sec.icon} ${esc(sec.label)}</a>`).join('');
+  const toc=`<div style="background:#F5F0E4;border:1px solid #C9B882;border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center"><h3 style="font-size:14px;font-weight:700;color:#6B4E1A;margin:0 0 12px;font-family:'Segoe UI','Noto Sans Thai',sans-serif">&#128203; สารบัญ</h3><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px">${tocLinks}</div></div>`;
+  const secHtml=sections.map((sec,i)=>buildAstekSec(sec,i)).join('');
+  const footer=`<div style="text-align:center;padding:18px 12px;border-top:2px solid #C9B882;margin-top:10px;background:#F5F0E4;border-radius:0 0 12px 12px;font-size:13px;color:#3A2800;line-height:2.2;font-family:'Segoe UI','Noto Sans Thai',sans-serif">&#128240; ไม่พลาดทุกข่าวสาร เชื่อมต่อกับผู้กอบกู้ท่านอื่นๆได้ที่ &#128044;<br>&#9642; Website: <a href="http://exe.in.th/tosm_main" style="color:#2D5E3E;font-weight:700">คลิก</a> &nbsp;|&nbsp; &#9642; Facebook Official Page: <a href="http://exe.in.th/tosm_like_fanpage" style="color:#2D5E3E;font-weight:700">คลิก</a> &nbsp;|&nbsp; &#9642; Facebook Group: <a href="http://exe.in.th/tosm_join_group" style="color:#2D5E3E;font-weight:700">คลิก</a><br>&#9642; Discord Official: <a href="https://exe.in.th/TOSM_Discord" style="color:#2D5E3E;font-weight:700">เข้าร่วม</a> &nbsp;|&nbsp; &#9642; LINE OA Official: <a href="http://exe.in.th/tosm_line" style="color:#2D5E3E;font-weight:700">คลิก</a></div>`;
+  return`<div style="max-width:700px;margin:0 auto;font-family:'Segoe UI','Noto Sans Thai',sans-serif;color:#1E2B1A">${hero}${toc}${secHtml}${footer}</div>`;
+}
+function buildAstekSec(sec,idx){
+  const def=SDEFS[sec.type]||{fields:[]};
+  const anchor=`<div id="ts${idx}" style="display:block;height:0;padding-top:48px;margin-top:-48px"></div>`;
+  const header=`<div style="text-align:center;margin-bottom:16px"><h3 style="display:inline-block;background:#000000;color:#F1C40F;font-size:18px;font-weight:700;padding:10px 32px;border-radius:10px;margin:0;font-family:'Segoe UI','Noto Sans Thai',sans-serif">${sec.icon} ${esc(sec.label)}</h3></div>`;
+  let body='';
+  if(def.gridLayout==='horizontal')body=buildAstekSubClass(sec);
+  else if(def.cardLayout)body=buildAstekNewClass(sec);
+  else if(def.tableLayout)body=buildAstekTable(sec,def);
+  else body=buildAstekCards(sec,def);
+  return`<div style="margin-bottom:28px">${anchor}${header}${body}</div>`;
+}
+function buildAstekSubClass(sec){
+  const instances=sec.instances||[];if(!instances.length)return'';
+  const order=instances[0]?.order||'';
+  let html='';
+  if(order)html+=`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:8px;padding:11px 16px;margin-bottom:10px;font-size:14px"><span style="color:#7A6940;min-width:110px;display:inline-block">ลำดับ Class</span><strong style="color:#1E2B1A">${esc(order)}</strong></div>`;
+  const cards=instances.map(inst=>{
+    const iconHtml=inst.icon&&inst.icon.startsWith('data:')?`<img src="${inst.icon}" style="width:52px;height:52px;object-fit:contain;border-radius:6px;display:block;margin:0 auto 8px">`:`<div style="width:52px;height:52px;background:#EDE8D4;border-radius:6px;border:1px solid #C9B882;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6B4E1A">Icon</div>`;
+    return`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:12px 8px;text-align:center">${iconHtml}<div style="font-size:14px;font-weight:700;color:#1E3A28;margin-bottom:2px">${esc(inst.main_class||'')}</div><div style="font-size:12px;color:#7A6940">${esc(inst.name||'')}</div></div>`;
+  }).join('');
+  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">${cards}</div>`;
+  return html;
+}
+function buildAstekNewClass(sec){
+  const instances=sec.instances||[];if(!instances.length)return'';
+  const className=instances[0]?.class_name||'';
+  let html=`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:13px 16px;margin-bottom:10px"><div style="font-size:12px;font-weight:700;color:#6B4E1A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #E8E0C8">ชื่อ Class</div><div style="font-size:15px;font-weight:700;color:#1E2B1A">${esc(className)}</div></div>`;
+  const cards=instances.map(inst=>{
+    const iconHtml=inst.sub_icon&&inst.sub_icon.startsWith('data:')?`<img src="${inst.sub_icon}" style="width:52px;height:52px;object-fit:contain;border-radius:6px;display:block;margin:0 auto 6px">`:'';
+    const charHtml=inst.char_image&&inst.char_image.startsWith('data:')?`<img src="${inst.char_image}" style="width:100%;max-width:110px;border-radius:8px;display:block;margin:6px auto 0">`:'';
+    return`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:12px 10px;text-align:center">${iconHtml}<div style="font-size:14px;font-weight:700;color:#1E3A28;margin-bottom:4px">${esc(inst.sub_name||'')}</div>${charHtml}</div>`;
+  }).join('');
+  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px">${cards}</div>`;
+  return html;
+}
+function buildAstekTable(sec,def){
+  const instances=sec.instances||[];if(!instances.length)return'';
+  const fields=def.fields.filter(f=>f.t!=='header');
+  const ths=fields.map(f=>`<th style="background:#2D5E3E;color:#F2ECC8;font-size:14px;font-weight:700;padding:9px 10px;text-align:left;word-break:break-word;border-bottom:1px solid #3A7050">${f.l}</th>`).join('');
+  const trs=instances.map((inst,i)=>{
+    const odd=i%2===0;const bg=odd?'#F5F0E4':'#2E2E2E';const tc=odd?'#1E2010':'#E4DDB0';const bc=odd?'#E0D8C0':'#3A3A3A';
+    const tds=fields.map(f=>{
+      const val=inst[f.k]||'';let cell='';
+      if(f.t==='image')cell=val&&val.startsWith('data:')?`<img src="${val}" style="width:44px;height:44px;object-fit:contain;border-radius:4px;display:block">`:'-';
+      else if(f.t==='daterange'||f.t==='daterange_notime')cell=typeof val==='object'?formatDateRange(val,f.t==='daterange'):(val?esc(String(val)):'—');
+      else cell=val?esc(String(val)):'—';
+      return`<td style="padding:8px 10px;border-bottom:1px solid ${bc};color:${tc};vertical-align:middle;background:${bg};word-break:break-word;font-size:13px">${cell}</td>`;
+    }).join('');
+    return`<tr>${tds}</tr>`;
+  }).join('');
+  return`<div style="border-radius:10px;overflow:hidden;border:1.5px solid #2D5E3E;margin-bottom:10px"><table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`;
+}
+function buildAstekCards(sec,def){
+  const instances=sec.instances||[];if(!instances.length)return'';
+  return instances.map(inst=>{
+    let body='';
+    def.fields.forEach(f=>{
+      if(f.t==='header')return;const val=inst[f.k];if(!val)return;
+      if(f.t==='image'){if(String(val).startsWith('data:'))body+=`<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:#6B4E1A;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">${f.l}</div><img src="${val}" style="max-width:100%;max-height:280px;border-radius:8px;display:block"></div>`;}
+      else if(f.t==='daterange'||f.t==='daterange_notime'){const disp=typeof val==='object'?formatDateRange(val,f.t==='daterange'):String(val);if(disp)body+=`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:14px"><span style="color:#7A6940;min-width:140px;flex-shrink:0">${f.l}</span><span style="color:#1E2B1A;font-weight:600">${esc(disp)}</span></div>`;}
+      else if(f.t==='url'){const sv=String(val).trim();if(!sv)return;body+=`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:14px"><span style="color:#7A6940;min-width:140px;flex-shrink:0">${f.l}</span><a href="${esc(sv)}" style="color:#2D5E3E;font-weight:600;word-break:break-all">${esc(sv)}</a></div>`;}
+      else if(f.t==='status_btn'){const sv=String(val).trim();if(!sv)return;const sc={'แก้ไขแล้ว':{bg:'rgba(16,185,129,.18)',border:'rgba(16,185,129,.45)',color:'#065f46'},'กำลังปรับปรุง':{bg:'rgba(245,158,11,.18)',border:'rgba(245,158,11,.45)',color:'#78350f'},'ปิดระบบ':{bg:'rgba(239,68,68,.18)',border:'rgba(239,68,68,.45)',color:'#7f1d1d'}}[sv]||{bg:'rgba(107,114,128,.15)',border:'rgba(107,114,128,.4)',color:'#374151'};body+=`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:14px;align-items:center"><span style="color:#7A6940;min-width:140px;flex-shrink:0">${f.l}</span><span style="background:${sc.bg};border:1px solid ${sc.border};color:${sc.color};font-size:12px;font-weight:700;padding:4px 16px;border-radius:20px">${esc(sv)}</span></div>`;}
+      else{const sv=String(val).trim();if(!sv)return;body+=`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:14px"><span style="color:#7A6940;min-width:140px;flex-shrink:0">${f.l}</span><span style="color:#1E2B1A;font-weight:600;white-space:pre-wrap">${esc(sv)}</span></div>`;}
+    });
+    return body?`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:14px 16px;margin-bottom:10px">${body}</div>`:'';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  MODAL & TOAST HELPERS
+// ═══════════════════════════════════════════
+function showModal(id){document.getElementById(id)?.classList.add('active');}
+function closeModal(id){document.getElementById(id)?.classList.remove('active');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('overlay'))e.target.classList.remove('active');});
+function toast(icon,msg,isErr=false){
+  const el=document.getElementById('toast');
+  document.getElementById('t-icon').textContent=icon;
+  document.getElementById('t-msg').textContent=msg;
+  el.style.borderColor=isErr?'rgba(239,68,68,.3)':'rgba(16,185,129,.3)';
+  el.style.color=isErr?'var(--red)':'var(--green)';
+  el.classList.add('show');clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3600);
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ═══════════════════════════════════════════
+//  STARTUP
+// ═══════════════════════════════════════════
+window.addEventListener('load',()=>{
+  initStorage();
+  processInviteHash();
+  const cid=localStorage.getItem('gpp_oauth_client_id')||GOOGLE_CLIENT_ID;
+  if(!cid||cid==='YOUR_GOOGLE_CLIENT_ID_HERE'){showPage('setup');return;}
+  GOOGLE_CLIENT_ID=cid;
+  try{
+    const saved=ls(SK.USER);
+    if(saved&&saved!==''){
+      const u=JSON.parse(saved);
+      const rec=getUserRecord(u.email);
+      if(rec){
+        const SEVEN_DAYS=7*24*60*60*1000;
+        if(u.lastActive&&(Date.now()-new Date(u.lastActive).getTime())>SEVEN_DAYS){ls(SK.USER,'');showPage('login');setTimeout(initGoogleBtn,300);return;}
+        if(rec.sessionRevoked){ls(SK.USER,'');showPage('login');setTimeout(initGoogleBtn,300);return;}
+        currentUser=u;loadMain();showPage('main');return;
+      }
+    }
+  }catch(e){}
+  showPage('login');setTimeout(initGoogleBtn,300);
+});
+</script>
+</body>
+</html>
