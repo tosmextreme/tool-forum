@@ -372,6 +372,28 @@ code{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-ra
         <div class="section-desc">นำเข้าข้อมูลและสร้างโพสต์ Forum สไตล์ TOSM</div>
       </div>
 
+      <!-- Author Info (moved to top) -->
+      <div class="form-card">
+        <div class="f-label" style="margin-bottom:14px">✍️ ข้อมูลผู้เขียน</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="f-label">ผู้โพสต์<span class="req">*</span></label>
+            <div class="name-wrap"><div class="name-prefix">GP :</div><input type="text" class="name-input" id="forum-author" placeholder="ชื่อของคุณ"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="f-label">บริษัท</label>
+            <div class="btn-group" id="forum-company-group">
+              <button type="button" class="company-btn" onclick="pickForumCompany(this,'EXE')">🏢 EXE</button>
+              <button type="button" class="company-btn" onclick="pickForumCompany(this,'COMBO')">🔀 COMBO</button>
+            </div>
+            <input type="hidden" id="forum-company">
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:8px 12px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:8px;font-size:12px;color:var(--text3)">
+          💡 ข้อมูลผู้เขียนจะ<strong style="color:var(--purple2)">ไม่ถูกเขียนลงใน Forum</strong> โดยระบบ Write by Skyboii
+        </div>
+      </div>
+
       <!-- Source Import -->
       <div class="form-card">
         <div class="f-label" style="margin-bottom:14px">📥 นำเข้าข้อมูล</div>
@@ -400,14 +422,8 @@ code{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-ra
         <div id="forum-import-status" style="display:none;margin-top:12px"></div>
       </div>
 
-      <!-- Raw content paste (fallback) -->
-      <div class="form-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="f-label" style="margin-bottom:0">📋 เนื้อหาดิบ (วางข้อความตรงนี้ได้เลย)</div>
-          <button class="btn btn-add btn-sm" onclick="parseRawContent()">⚡ แบ่ง Sections</button>
-        </div>
-        <textarea class="f-textarea" id="forum-raw-content" rows="6" placeholder="วางเนื้อหาที่คัดลอกมาจากที่ใดก็ได้ แล้วกด 'แบ่ง Sections' เพื่อแยกเป็นหัวข้ออัตโนมัติ หรือสร้าง Section ด้วยตนเองด้านล่าง"></textarea>
-      </div>
+      <!-- Hidden raw-content buffer (used by PDF/GDoc import paths) -->
+      <textarea id="forum-raw-content" style="display:none"></textarea>
 
       <!-- Forum Meta -->
       <div class="form-card">
@@ -416,23 +432,9 @@ code{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-ra
           <label class="f-label">หัวข้อ Forum<span class="req">*</span></label>
           <input type="text" class="f-input" id="forum-title" placeholder="เช่น Patch Note ประจำวันที่ 25/05/2026">
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div class="form-group" style="margin-bottom:0">
-            <label class="f-label">ผู้โพสต์<span class="req">*</span></label>
-            <div class="name-wrap"><div class="name-prefix">GP :</div><input type="text" class="name-input" id="forum-author" placeholder="ชื่อของคุณ"></div>
-          </div>
-          <div class="form-group" style="margin-bottom:0">
-            <label class="f-label">วันที่<span class="req">*</span></label>
-            <input type="date" class="date-input" id="forum-date">
-          </div>
-        </div>
-        <div class="form-group" style="margin-top:14px;margin-bottom:0">
-          <label class="f-label">บริษัท<span class="req">*</span></label>
-          <div class="btn-group" id="forum-company-group">
-            <button type="button" class="company-btn" onclick="pickForumCompany(this,'EXE')">🏢 EXE</button>
-            <button type="button" class="company-btn" onclick="pickForumCompany(this,'COMBO')">🔀 COMBO</button>
-          </div>
-          <input type="hidden" id="forum-company">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="f-label">วันที่<span class="req">*</span></label>
+          <input type="date" class="date-input" id="forum-date">
         </div>
       </div>
 
@@ -445,6 +447,7 @@ code{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-ra
 
       <!-- Actions -->
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="btn btn-primary" id="skyboi-btn" onclick="writeBySkyboi()" style="background:linear-gradient(135deg,#9333ea,#6d28d9);box-shadow:0 4px 16px rgba(147,51,234,.3)">✍️ Write by Skyboii</button>
         <button class="btn btn-primary" onclick="generateForumHTML()">⚡ Generate Forum HTML</button>
         <button class="btn btn-secondary" onclick="clearForum()">🔄 ล้างทั้งหมด</button>
       </div>
@@ -1761,6 +1764,9 @@ function _rowsToSections(rows, sheetName){
         headers:curTableRows[0].map(c=>typeof c==='object'?'[img]':String(c||'')),
         rows:curTableRows.slice(1).map(r=>r.map(c=>typeof c==='object'?'[img]':String(c||'')))
       }:null,
+      rawRows:hasTable?curTableRows.map(row=>row.map(c=>
+        typeof c==='object'&&c&&c.type==='image'?{type:'image',url:c.url}:String(c??'')
+      )):null,
       isTable:hasTable
     });
     curTitle='';curLines=[];curImages=[];curTableRows=[];isTblMode=false;
@@ -1957,6 +1963,228 @@ function clearForum(){
   renderForumSections();
   document.getElementById('forum-preview-card').style.display='none';
   toast('🔄','ล้างข้อมูลแล้ว');
+}
+
+// ═══════════════════════════════════════════
+//  WRITE BY SKYBOII
+// ═══════════════════════════════════════════
+// Only these columns are allowed in reward tables
+const REWARD_ALLOWED=['img','item name','amt','tradable'];
+
+// Fetch URL → resize → base64 WebP (crossOrigin)
+async function fetchImgToWebP(url,maxW=72){
+  if(!url||url.startsWith('data:'))return url||'';
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    const done=dataUrl=>resolve(dataUrl);
+    img.onload=()=>{
+      try{
+        let w=img.naturalWidth||maxW,h=img.naturalHeight||maxW;
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+        if(h>maxW*2){w=Math.round(w*(maxW*2)/h);h=maxW*2;}
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        done(c.toDataURL('image/webp',0.82));
+      }catch(e){done(url);}
+    };
+    img.onerror=()=>done(url);
+    setTimeout(()=>done(url),8000);
+    img.src=url;
+  });
+}
+
+// Build lookup map: (itemId|itemName).toLowerCase() → imageUrl
+// from any section whose title contains "data" (case-insensitive)
+function buildDataLookup(){
+  const map={};
+  forumSections.forEach(sec=>{
+    if(!sec.isTable||!sec.rawRows||!sec.rawRows.length)return;
+    if(!(sec.title||'').toLowerCase().includes('data'))return;
+    const headers=sec.rawRows[0];
+    if(!headers)return;
+    const imgIdx=headers.findIndex(h=>typeof h==='string'&&/^img$/i.test(String(h).trim()));
+    const idIdx=headers.findIndex(h=>typeof h==='string'&&/item.?id/i.test(String(h).trim()));
+    const nmIdx=headers.findIndex(h=>typeof h==='string'&&/item.?name/i.test(String(h).trim()));
+    if(imgIdx<0)return;
+    sec.rawRows.slice(1).forEach(row=>{
+      const cell=row[imgIdx];
+      let imgUrl=(typeof cell==='object'&&cell&&cell.type==='image')?cell.url
+        :(typeof cell==='string'&&cell.startsWith('http'))?cell:'';
+      if(!imgUrl)return;
+      if(idIdx>=0&&row[idIdx]){map[String(row[idIdx]).trim().toLowerCase()]=imgUrl;}
+      if(nmIdx>=0&&row[nmIdx]){map[String(row[nmIdx]).trim().toLowerCase()]=imgUrl;}
+    });
+  });
+  return map;
+}
+
+// Detect if a section is a reward/item table
+function isRewardTable(sec){
+  if(!sec.isTable||!sec.tableData||!sec.tableData.headers)return false;
+  const hdrs=sec.tableData.headers.map(h=>String(h||'').toLowerCase().trim());
+  return hdrs.some(h=>h==='item name'||h==='amt'||h==='tradable');
+}
+
+// Process a reward table: filter to allowed columns, resolve + convert images
+async function processRewardTableSection(sec,dataLookup){
+  const rawHeaders=sec.rawRows?sec.rawRows[0]:sec.tableData.headers.map(h=>h);
+  const rawDataRows=sec.rawRows?sec.rawRows.slice(1):sec.tableData.rows.map(r=>[...r]);
+
+  const colMap=[];
+  rawHeaders.forEach((h,i)=>{
+    const hLc=String(h||'').toLowerCase().trim();
+    if(REWARD_ALLOWED.includes(hLc))colMap.push({origIdx:i,colName:String(h||'').trim()});
+  });
+  if(!colMap.length)return sec;
+
+  const itemNmIdx=rawHeaders.findIndex(h=>String(h||'').toLowerCase().trim()==='item name');
+  const itemIdIdx=rawHeaders.findIndex(h=>String(h||'').toLowerCase().trim()==='item id');
+
+  const newHeaders=colMap.map(c=>c.colName);
+
+  const newRows=await Promise.all(
+    rawDataRows
+      .filter(row=>row.some(c=>typeof c==='object'||(String(c||'').trim()!=='')))
+      .map(row=>Promise.all(colMap.map(async({origIdx,colName})=>{
+        const cell=row[origIdx];
+        const colLc=colName.toLowerCase().trim();
+        if(colLc==='img'){
+          let imgUrl='';
+          if(typeof cell==='object'&&cell&&cell.type==='image')imgUrl=cell.url||'';
+          else if(typeof cell==='string'&&cell.startsWith('http'))imgUrl=cell;
+          // Fallback: Data tab lookup
+          if(!imgUrl){
+            const nm=itemNmIdx>=0?String(row[itemNmIdx]||'').trim().toLowerCase():'';
+            const id=itemIdIdx>=0?String(row[itemIdIdx]||'').trim().toLowerCase():'';
+            imgUrl=dataLookup[nm]||dataLookup[id]||'';
+          }
+          if(imgUrl)imgUrl=await fetchImgToWebP(imgUrl,72);
+          return imgUrl?{type:'image',url:imgUrl}:'';
+        }
+        if(typeof cell==='object'&&cell&&cell.type==='image')return String(cell.url||'');
+        return String(cell??'');
+      })))
+  );
+
+  return{
+    ...sec,
+    tableData:{
+      headers:newHeaders,
+      rows:newRows.map(r=>r.map(c=>typeof c==='object'&&c&&c.type==='image'?c.url||'':c))
+    },
+    skyboiiRows:{headers:newHeaders,rows:newRows},
+    isRewardTable:true
+  };
+}
+
+// Render a reward table with inline item images
+function buildSkyboiiRewardTable(skyboiiRows){
+  const{headers,rows}=skyboiiRows;
+  if(!headers.length||!rows.length)return'';
+  const ths=headers.map(h=>`<th style="background:#2D5E3E;color:#F2ECC8;font-size:13px;font-weight:700;padding:9px 12px;text-align:center;border-bottom:1px solid #3A7050;white-space:nowrap">${esc(String(h||''))}</th>`).join('');
+  const trs=rows.map((row,i)=>{
+    const odd=i%2===0;
+    const bg=odd?'#F5F0E4':'#FFFFFF';
+    const tc=odd?'#1E2010':'#2E2E2E';
+    const bc=odd?'#E0D8C0':'#EBEBEB';
+    const tds=row.map((c,ci)=>{
+      const hLc=(headers[ci]||'').toLowerCase().trim();
+      let inner='';
+      if(typeof c==='object'&&c&&c.type==='image'&&c.url){
+        inner=`<img src="${esc(c.url)}" style="max-width:60px;max-height:60px;border-radius:6px;display:block;margin:auto;border:1px solid #ddd" alt="">`;
+      }else if(hLc==='tradable'){
+        const v=String(c||'').trim().toLowerCase();
+        const ok=v==='true'||v==='1'||v==='yes'||v==='✅'||v==='tradable'||v==='ได้'||v==='ได้เลย';
+        inner=ok?'<span style="font-size:18px">✅</span>':'<span style="font-size:18px">❌</span>';
+      }else{inner=esc(String(c||''));}
+      return`<td style="padding:8px 10px;border-bottom:1px solid ${bc};color:${tc};vertical-align:middle;background:${bg};font-size:13px;text-align:center;word-break:break-word">${inner}</td>`;
+    }).join('');
+    return`<tr>${tds}</tr>`;
+  }).join('');
+  return`<div style="border-radius:10px;overflow:hidden;border:1.5px solid #2D5E3E;margin-bottom:10px"><table style="width:100%;border-collapse:collapse"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`;
+}
+
+// Build a single section for Skyboii output
+function buildSkyboiiSection(sec,idx){
+  const anchor=`<div id="fp${idx}" style="display:block;height:0;padding-top:48px;margin-top:-48px"></div>`;
+  const header=`<div style="text-align:center;margin-bottom:16px"><h3 style="display:inline-block;background:#000000;color:#F1C40F;font-size:18px;font-weight:700;padding:10px 32px;border-radius:10px;margin:0;font-family:'Segoe UI','Noto Sans Thai',sans-serif">${esc(sec.title)}</h3></div>`;
+  let body='';
+  if(sec.isRewardTable&&sec.skyboiiRows){body+=buildSkyboiiRewardTable(sec.skyboiiRows);}
+  else if(sec.isTable&&sec.tableData&&sec.tableData.headers&&sec.tableData.rows.length>0){body+=buildForumTable(sec.tableData);}
+  if(sec.content&&sec.content.trim()){
+    body+=`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:14px 16px;margin-bottom:10px"><p style="font-size:14px;color:#1E2B1A;line-height:1.75;white-space:pre-wrap;margin:0;font-family:'Segoe UI','Noto Sans Thai',sans-serif">${esc(sec.content)}</p></div>`;
+  }
+  if(sec.imageUrl&&sec.imageUrl.trim()){
+    body+=`<div style="text-align:center;margin-bottom:10px"><img src="${esc(sec.imageUrl)}" style="max-width:100%;border-radius:10px;border:1px solid #DDD5B4" alt="${esc(sec.title)}"></div>`;
+  }
+  if(!body)body=`<div style="background:#FAFAF6;border:1px solid #DDD5B4;border-radius:10px;padding:14px 16px;margin-bottom:10px;color:#7A6940;font-style:italic;font-size:13px">(ไม่มีเนื้อหา)</div>`;
+  return`<div style="margin-bottom:28px">${anchor}${header}${body}</div>`;
+}
+
+// ── Main entry point ──
+async function writeBySkyboi(){
+  if(forumSections.length===0){toast('⚠️','กรุณานำเข้าข้อมูลก่อนใช้ Write by Skyboii',true);return;}
+  const btn=document.getElementById('skyboi-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='⏳ กำลังเขียน...';}
+  try{
+    // Sync DOM edits
+    forumSections.forEach(sec=>{
+      const tEl=document.getElementById('ftitle_'+sec.id);if(tEl)sec.title=tEl.value;
+      const cEl=document.getElementById('fcontent_'+sec.id);if(cEl)sec.content=cEl.value;
+    });
+    const title=document.getElementById('forum-title').value.trim();
+    const date=document.getElementById('forum-date').value;
+    if(!title){toast('⚠️','กรุณาใส่หัวข้อ Forum ก่อน',true);return;}
+    if(!date){toast('⚠️','กรุณาเลือกวันที่ก่อน',true);return;}
+
+    const dataLookup=buildDataLookup();
+
+    const processed=await Promise.all(forumSections.map(sec=>
+      isRewardTable(sec)?processRewardTableSection(sec,dataLookup):Promise.resolve(sec)
+    ));
+
+    const pdate=date.split('-').reverse().join('/');
+    const dtStr=new Date(date).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
+
+    // Hero — author/company intentionally omitted per spec
+    const hero=`<div style="background:#1E3A28;border-radius:14px;padding:28px 26px 22px;margin-bottom:10px;border:1px solid #2D5E3E">
+<div style="margin-bottom:12px"><span style="background:#C9973A;color:#2A1400;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:.8px">FORUM POST</span><span style="font-size:11px;color:#A8D4B4;margin-left:8px">GP:PURPLE</span></div>
+<h1 style="font-size:20px;font-weight:700;color:#F2ECC8;margin:0 0 6px;line-height:1.35;font-family:'Segoe UI','Noto Sans Thai',sans-serif">${esc(title)}</h1>
+<p style="font-size:13px;color:#C4E0CB;margin:0 0 16px">Tales of Souls Master &middot; เซิร์ฟเวอร์ไทย</p>
+<div style="display:flex;flex-wrap:wrap;gap:18px;padding-top:12px;border-top:1px solid rgba(201,151,58,.22)">
+<span style="font-size:13px;color:#A8D4B4">&bull; วันที่ <strong style="color:#F2ECC8">${dtStr}</strong></span>
+<span style="font-size:13px;color:#A8D4B4">&bull; หัวข้อ <strong style="color:#F2ECC8">${processed.map(s=>esc(s.title)).join(', ')}</strong></span>
+</div></div>`;
+
+    const tocLinks=processed.map((s,i)=>`<a href="#fp${i}" style="font-size:14px;color:#2D5E3E;padding:5px 10px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;border-radius:6px;border:1px solid rgba(45,94,62,.2)">&#128203; ${esc(s.title)}</a>`).join('');
+    const toc=`<div style="background:#F5F0E4;border:1px solid #C9B882;border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center"><h3 style="font-size:14px;font-weight:700;color:#6B4E1A;margin:0 0 12px;font-family:'Segoe UI','Noto Sans Thai',sans-serif">&#128203; สารบัญ</h3><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px">${tocLinks}</div></div>`;
+
+    const sectionsHtml=processed.map((s,i)=>buildSkyboiiSection(s,i)).join('');
+
+    const footer=`<div style="text-align:center;padding:18px 12px;border-top:2px solid #C9B882;margin-top:10px;background:#F5F0E4;border-radius:0 0 12px 12px;font-size:13px;color:#3A2800;line-height:2.2;font-family:'Segoe UI','Noto Sans Thai',sans-serif">
+&#128240; ไม่พลาดทุกข่าวสาร เชื่อมต่อกับผู้กอบกู้ท่านอื่นๆได้ที่ &#128044;<br>
+&#9642; Website: <a href="http://exe.in.th/tosm_main" style="color:#2D5E3E;font-weight:700">คลิก</a> &nbsp;|&nbsp;
+&#9642; Facebook Official Page: <a href="http://exe.in.th/tosm_like_fanpage" style="color:#2D5E3E;font-weight:700">คลิก</a> &nbsp;|&nbsp;
+&#9642; Facebook Group: <a href="http://exe.in.th/tosm_join_group" style="color:#2D5E3E;font-weight:700">คลิก</a><br>
+&#9642; Discord Official: <a href="https://exe.in.th/TOSM_Discord" style="color:#2D5E3E;font-weight:700">เข้าร่วม</a> &nbsp;|&nbsp;
+&#9642; LINE OA Official: <a href="http://exe.in.th/tosm_line" style="color:#2D5E3E;font-weight:700">คลิก</a>
+</div>`;
+
+    forumGeneratedHTML=`<div style="max-width:700px;margin:0 auto;font-family:'Segoe UI','Noto Sans Thai',sans-serif;color:#1E2B1A">${hero}${toc}${sectionsHtml}${footer}</div>`;
+    forumSections=processed;
+    renderForumSections();
+    document.getElementById('forum-preview-area').innerHTML=forumGeneratedHTML;
+    document.getElementById('forum-html-output').value=forumGeneratedHTML;
+    document.getElementById('forum-preview-card').style.display='';
+    document.getElementById('forum-preview-card').scrollIntoView({behavior:'smooth',block:'start'});
+    toast('✅','Write by Skyboii เสร็จแล้ว! ตรวจสอบ Preview ด้านล่าง');
+  }catch(err){
+    toast('❌','เกิดข้อผิดพลาด: '+err.message,true);
+    console.error('Skyboii error:',err);
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='✍️ Write by Skyboii';}
+  }
 }
 
 // ═══════════════════════════════════════════
